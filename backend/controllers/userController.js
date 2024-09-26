@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const User = require('../models/User.js');
 const bcrytpjs = require('bcryptjs')
+const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 
 const Register = async (req, res) => {
     try {
@@ -38,8 +40,67 @@ const Register = async (req, res) => {
     }
 };
 
-const Login = async (req, res) => {
+// Generate a secret key
+const generateSecretKey = () => {
+    const secret = crypto.randomBytes(32).toString("hex");
+    return secret;
+};
+  
+// Create a secret key
+const secretKey = generateSecretKey();
 
+const Login = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+
+        // Check if user exist in the database
+        const user = await User.findOne({email});
+        if(!user) {
+            return res.status(400).json({message: "Ce compte n'existe pas. Veuillez vous inscrire"});
+        }
+
+        const userPass = await bcrytpjs.compare(password, user.password);
+        if(!userPass) {
+            return res.status(400).json({message: "Mot de passe incorrect"});
+        }
+
+        const token = jwt.sign({userId:user._id}, secretKey)
+        res.status(200).json({message: "Vous êtes connecté", token});
+
+    } catch (error) {
+        console.log("Error : ", error);
+        res.status(500).json({message: "Erreur de server"});
+    }
+};
+
+const UpdateUserProfile = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const {nom, prenom, email} = req.body;
+
+        // Vérifiez si userId est une chaîne valide avant de faire la requête
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "ID utilisateur invalide" });
+        }
+
+        const user = await User.findByIdAndUpdate(userId, {nom, prenom, email}, {new: true});
+
+        if(!user) {
+            return res.status(404).json({message: "Utilisateur non trouvé"});
+        }
+
+        // Exclure le mot de passe et le type d'utilisateur de la réponse
+        const { password, userType, createdAt, ...userResponse } = user.toObject();
+
+        // Inclure updatedAt dans la réponse
+        userResponse.updatedAt = user.updatedAt;
+
+        res.status(200).json({ message: "Votre profil a été mis à jour", user: userResponse });
+                
+    } catch (error) {
+        console.log("Erreur: ", error);
+        res.status(500).json({message: "Erreur de server"});
+    }
 }
 
-module.exports = {Register, Login}
+module.exports = {Register, Login, UpdateUserProfile}
