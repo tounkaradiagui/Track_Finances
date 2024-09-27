@@ -59,12 +59,12 @@ const Login = async (req, res) => {
             return res.status(400).json({message: "Ce compte n'existe pas. Veuillez vous inscrire"});
         }
 
-        const userPass = await bcrytpjs.compare(password, user.password);
-        if(!userPass) {
+        const isPasswordValid = await bcrytpjs.compare(password, user.password);
+        if(!isPasswordValid) {
             return res.status(400).json({message: "Mot de passe incorrect"});
         }
 
-        const token = jwt.sign({userId:user._id}, secretKey)
+        const token = jwt.sign({userId:user._id}, secretKey);  //{expiresIn: '1h'}
         res.status(200).json({message: "Vous êtes connecté", token});
 
     } catch (error) {
@@ -101,6 +101,50 @@ const UpdateUserProfile = async (req, res) => {
         console.log("Erreur: ", error);
         res.status(500).json({message: "Erreur de server"});
     }
+};
+
+
+// const Logout = async (req, res) => {
+
+// }
+
+const ForgotPassword = async (req, res) => {
+    try {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+
+        if(!user) {
+            return res.status(404).json({message: "Utilisateur non trouvé"})
+        }
+
+        // Générer un token de réinitialisation
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiresAt = Date.now + 1 * 60 * 60 * 1000 // 1h
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+        await user.save();
+
+        // await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
+    } catch (error) {
+        
+    }
+};
+
+const DeleteUserAccount = async (req, res) => {
+    try {
+        const  userId = req.params.userId;
+
+        const user = await User.findByIdAndDelete(userId);
+        if(!user) {
+            return res.status(404).json({message: "Utilisateur non trouvé"});
+        }
+        res.status(200).json({message: "Votre compte a été supprimé"});
+    } catch (error) {
+        console.log("Erreur: ", error);
+        res.status(500).json({message: "Erreur de server"});
+    }
 }
 
-module.exports = {Register, Login, UpdateUserProfile}
+module.exports = {Register, Login, UpdateUserProfile, DeleteUserAccount, ForgotPassword}
