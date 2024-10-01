@@ -1,13 +1,12 @@
 const mongoose = require('mongoose')
 
 const BudgetSchema = new mongoose.Schema({
-    category: {type: String, required: false},
     userId: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-    startDate: {type: Date, required: true},
-    endDate: {type: Date, required: true},
-    remainingAmount: {type: Number, default: function () {return this.amount;}}, //Montant restant à dépenser
-    createdAt: {type: Date, default: Date.now}
-}, { collection: "Budget" });
+    categoryId: {type: mongoose.Schema.Types.ObjectId, ref: "Category"},
+    period:{type: String, enum: ['mensuel', 'trimestriel', 'semestriel', 'annuel'], default: 'mensuel'},
+    description:{type: String},
+    amount: {type: Number, default: function () {return this.amount;}}, //Montant restant à dépenser
+}, { collection: "Budget", timestamps:true });
 
 const Budget = mongoose.model("Budget", BudgetSchema);
 module.exports = Budget;

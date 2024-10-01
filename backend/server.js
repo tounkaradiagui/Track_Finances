@@ -3,8 +3,12 @@ const dotenv = require('dotenv');
 const connectBD = require('./config/dbConnection');
 const mongoose= require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
-const authRoutes = require('./routes/userRoutes.js')
+const authRoutes = require('./routes/userRoutes.js');
+const categoryRoutes = require('./routes/categoryRoutes.js');
+const transactionRoutes = require('./routes/transactionRoutes.js');
+const budgetRoutes = require('./routes/budgetRoutes.js');
 
 
 dotenv.config();
@@ -12,6 +16,7 @@ connectBD();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,6 +27,9 @@ const APP_URL = process.env.BASE_URL
 
 //Authentication endpoint
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/user', categoryRoutes);
+app.use('/api/auth', transactionRoutes);
+app.use('/api/auth/budget', budgetRoutes);
 
 
 //Pour les requetes des page inexistantes, renvoie la view suivante
@@ -35,7 +43,6 @@ app.all('*',(req, res) => {
         res.type('txt').send('404 Not found')
     }
 });
-
 
 // Connexion à la base de données
 mongoose.connection.once('open', () => {
