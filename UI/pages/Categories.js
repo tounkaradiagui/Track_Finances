@@ -12,7 +12,7 @@ const Categories = () => {
             <TouchableOpacity style={{backgroundColor:"#078ECB", paddingVertical:30, paddingHorizontal:15, borderRadius:10}}>
 
               <View>
-                <Text style={{color:"#fff", fontWeight:"bold"}}>Catégorie d'épargne</Text>
+                <Text style={{color:"#fff", fontWeight:"bold"}}>Ajouter Catégorie</Text>
               </View>
             </TouchableOpacity>
             {/* <View>
@@ -20,14 +20,14 @@ const Categories = () => {
             </View> */}
             <TouchableOpacity style={{backgroundColor:"#078ECB", paddingVertical:30, paddingHorizontal:23, borderRadius:10}}>
               <View>
-                <Text style={{color:"#fff", fontWeight:"bold"}}>Objectif Financier</Text>
+                <Text style={{color:"#fff", fontWeight:"bold"}}>Fixer un Objectif</Text>
               </View>
 
             </TouchableOpacity>
           </View>
 
           <View style={{marginHorizontal:20, borderBottomWidth:2, borderBlockColor:"#078ECB"}}>
-              <Text style={{fontWeight:"bold", fontSize:20}}>Liste Catégorie d'Epargne</Text>
+              <Text style={{fontWeight:"bold", fontSize:20}}>Liste de Catégorie</Text>
           </View>
 
           <View
@@ -224,7 +224,7 @@ const Categories = () => {
           </View>
 
           <View style={{marginHorizontal:20, borderBottomWidth:2, borderBlockColor:"#078ECB", marginTop:15}}>
-              <Text style={{fontWeight:"bold",fontSize:20}}>Objectis Financiers</Text>
+              <Text style={{fontWeight:"bold",fontSize:20}}>Objectifs Financiers</Text>
           </View>        
 
           <View

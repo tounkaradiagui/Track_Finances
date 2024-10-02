@@ -388,12 +388,12 @@ const styles = StyleSheet.create({
   },
 
   salutation: {
-    fontSize: 15,
+    fontSize: 25,
     fontWeight: "bold",
   },
 
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });
