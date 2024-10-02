@@ -78,15 +78,15 @@ const Login = async (req, res) => {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id, email: user.email }, secretKey, { expiresIn: '7d' });
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Utilisez secure uniquement en production
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
     });
-    // res.cookie("Authorization", "Bearer" + token, { expiresIn: '7d' });
 
     res.status(200).json({ message: "Vous êtes connecté", token });
+
   } catch (error) {
     console.log("Error : ", error);
     res.status(500).json({ message: "Erreur de server" });
@@ -165,6 +165,14 @@ const ForgotPassword = async (req, res) => {
   }
 };
 
+const ResetPassword = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
+
 const DeleteUserAccount = async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -180,6 +188,14 @@ const DeleteUserAccount = async (req, res) => {
   }
 };
 
+const ChangePassword = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
+
 module.exports = {
   Register,
   Login,
@@ -188,4 +204,6 @@ module.exports = {
   ForgotPassword,
   secretKey,
   Logout,
+  ChangePassword,
+  ResetPassword
 };

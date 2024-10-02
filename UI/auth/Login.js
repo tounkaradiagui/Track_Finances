@@ -112,7 +112,7 @@ const Login = () => {
                   borderRadius: 10,
                   alignItems: "center",
                 }}
-                onPress={() => navigation.navigate("Dashboard")}
+                onPress={() => navigation.navigate("BottomTabs")}
               >
                 <Text
                   style={{
