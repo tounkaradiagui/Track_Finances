@@ -10,7 +10,6 @@ const categoryRoutes = require('./routes/categoryRoutes.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
 const budgetRoutes = require('./routes/budgetRoutes.js');
 
-
 dotenv.config();
 connectBD();
 

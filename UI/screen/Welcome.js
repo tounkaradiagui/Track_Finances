@@ -65,7 +65,7 @@ const Welcome = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#078ECB" color="#fff"/>
+      <StatusBar backgroundColor="#078ECB" style="light"/>
       <View style={{alignItems: "flex-end", marginTop:40, marginEnd:10}}>
         <TouchableOpacity
           onPress={()=>{navigation.navigate('Login')}}

@@ -5,7 +5,13 @@ const UserSchema = new mongoose.Schema({
     prenom: {type: String, required:true},
     email: {type: String, required:true, unique:true},
     password: {type: String, required: true},
-    userType: {type: String, enum: ["ouvrier", "gestionnaire", "etudiant", "freelance", "fonctionnaire", "commerçant", "chauffeur"], required: true},
+    confirmPassword: {type: String, required: true},
+    userType: { 
+        type: String, 
+        enum: ["ouvrier", "gestionnaire", "etudiant", "freelance", "fonctionnaire", "commerçant", "chauffeur"], 
+        default: "freelance", 
+        required: false 
+    },
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     lastLogin: {type:Date, default: Date.now}

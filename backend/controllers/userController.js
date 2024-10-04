@@ -6,10 +6,10 @@ const jwt = require("jsonwebtoken");
 
 const Register = async (req, res) => {
   try {
-    const { nom, prenom, email, password, userType } = req.body;
+    const { nom, prenom, email, password, confirmPassword, userType } = req.body;
 
     //Verifier si les champs ne sont pas vide
-    if (!nom || !prenom || !email || !password || !userType) {
+    if (!nom || !prenom || !email || !password || !confirmPassword) {
       return res
         .status(400)
         .json({ message: "Tous les champs sont obligatoires" });
@@ -34,7 +34,7 @@ const Register = async (req, res) => {
       prenom: prenom,
       email: email,
       password: hashedPassword,
-      userType: userType,
+      confirmPassword: hashedPassword,
     });
 
     await newUser.save();
@@ -78,14 +78,18 @@ const Login = async (req, res) => {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, secretKey, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id, email: user.email, nom:user.nom }, secretKey, { expiresIn: '7d' });
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Utilisez secure uniquement en production
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
     });
 
-    res.status(200).json({ message: "Vous êtes connecté", token });
+    res.status(200).json({
+      message: "Vous êtes connecté",
+      token,
+      user,
+    });
 
   } catch (error) {
     console.log("Error : ", error);
@@ -196,6 +200,31 @@ const ChangePassword = async (req, res) => {
   }
 };
 
+
+const protectedData = (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est connecté
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: "Accès refusé. Vous devez être connecté." });
+    }
+
+    // Crée les données protégées
+    const data = {
+      message: 'Voici vos données protégées !',
+      userId: req.user.userId, // Utilisateur authentifié
+      nom: req.user.nom,
+      prenom: req.user.prenom,
+      email: req.user.email
+    };
+    // Envoie les données protégées
+    res.json(data);
+
+
+  } catch (error) {
+   console.log(error); 
+  }  
+};
+
 module.exports = {
   Register,
   Login,
@@ -205,5 +234,6 @@ module.exports = {
   secretKey,
   Logout,
   ChangePassword,
-  ResetPassword
+  ResetPassword,
+  protectedData
 };

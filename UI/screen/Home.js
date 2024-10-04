@@ -8,12 +8,29 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useContext, useState } from "react";
+import { UserType } from "../context/userContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from 'jwt-decode'
 
 const Home = () => {
   const navigation = useNavigation();
+
+  // const [userId, setUserId] = useContext(UserType);
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     const token = await AsyncStorage.getItem("authToken");
+  //     const decodedToken = jwt_decode(token);
+  //     const userId = decodedToken.userId;
+  //     setUserId(userId);
+  //   };
+  //   fetchUser();
+  // }, []);
+
   return (
     <SafeAreaView>
-      <StatusBar backgroundColor="#078ECB" color="#fff"/>
+      <StatusBar backgroundColor="#078ECB" style="light"/>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.headerTop}>

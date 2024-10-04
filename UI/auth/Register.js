@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, KeyboardAvoidingView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, KeyboardAvoidingView, TextInput, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -24,6 +24,43 @@ const Register = () => {
   };
 
   const navigation = useNavigation();
+
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleRegister = async () => {
+    try {
+      const userData = {
+        nom: nom,
+        prenom: prenom,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword
+      };
+
+      const response = await fetch(`http://192.168.106.140:5000/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)        
+      });
+
+      if(!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur de connexion');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      Alert.alert('Connexion réussie', 'Bienvenue !');
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <SafeAreaView>
@@ -59,8 +96,8 @@ const Register = () => {
               <TextInput
                 require={true}
                 placeholder="Nom"
-                // value={name}
-                // onChangeText={(text) => setName(text)}
+                value={nom}
+                onChangeText={setNom}
                 style={{ 
                   width: 250,
                   borderColor: "#078ECB",
@@ -94,8 +131,8 @@ const Register = () => {
               <TextInput
                 require={true}
                 placeholder="Prénom"
-                // value={name}
-                // onChangeText={(text) => setName(text)}
+                value={prenom}
+                onChangeText={setPrenom}
                 style={{ 
                   width: 250,
                   borderColor: "#078ECB",
@@ -127,8 +164,8 @@ const Register = () => {
                 color="black"
               />
               <TextInput
-                // value={email}
-                // onChangeText={(text) => setEmail(text)}
+                value={email}
+                onChangeText={setEmail}
                 placeholder="Adresse Email"
                 style={{
                   
@@ -161,8 +198,8 @@ const Register = () => {
                 color="black"
               />
               <TextInput
-                // value={password}
-                // onChangeText={(text) => setPassword(text)}
+                value={password}
+                onChangeText={setPassword}
                 secureTextEntry={!showPassword}
                 style={{ width: 250 }}
                 placeholder="Mot de passe"
@@ -198,8 +235,8 @@ const Register = () => {
                 color="black"
               />
               <TextInput
-                // value={password}
-                // onChangeText={(text) => setPassword(text)}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
                 style={{ width: 250 }}
                 placeholder="Confirmer le Mot de passe"
@@ -235,7 +272,7 @@ const Register = () => {
                 borderRadius: 10,
                 alignItems: "center",
               }}
-              // onPress={() => navigation.navigate("Login")}
+              onPress={handleRegister}
             >
               <Text
                 style={{

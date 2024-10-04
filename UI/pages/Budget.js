@@ -10,7 +10,7 @@ const Budget = () => {
     { id: '1', name: 'Alimentation', amount: 200, icon: 'utensils' },
     { id: '2', name: 'Transport', amount: 150, icon: 'bus' },
     { id: '3', name: 'Loisirs', amount: 100, icon: 'gamepad' },
-    { id: '4', name: 'Épargne', amount: 300, icon: 'piggy-bank' },
+    { id: '4', name: 'Épargne', amount: 300, icon: 'bank' },
   ];
 
   const renderItem = ({ item }) => (

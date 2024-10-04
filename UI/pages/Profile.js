@@ -7,212 +7,234 @@ import {
     TouchableOpacity,
     Switch
   } from "react-native";
-  import { StatusBar } from "expo-status-bar";
-  import React, {useState} from "react";
-  import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import React, {useState} from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
   
-  import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../UserContext";
+
+import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
   
   const Profile = () => {
     // const [darkModeEnabled, setDarkModeEnabled] = useState(false);
     // const toggleSwitch = () => {
     //   setDarkModeEnabled(!darkModeEnabled);
     // };
+    const {user, setUser } = useUser();
+    const navigation = useNavigation();
+
+    const handleLogout = () => {
+      clearAuthToken();
+    }
+
+    const clearAuthToken = async () => {
+      await AsyncStorage.removeItem('authToken');
+      console.log('Token removed');
+      setUser("");
+      navigation.navigate("PublicScreen");
+    }
   
     return (
       <SafeAreaView style={styles.container}>
-          <View style={styles.profile}>
-            <StatusBar backgroundColor="#078ECB" color="#fff"/>
-            <TouchableOpacity>
-              <View style={styles.ProfilePicture}>
-                <Image
-                  source={require("../assets/images/profile-picture.jpg")}
-                  style={styles.ProfilePicture}
-                />
-              </View>
-              <View style={styles.FeatherIcon}>
-                <FontAwesome name="camera" size={15} color="white" />
-                {/* <Feather name="edit" size={15} color="white" /> */}
-              </View>
-            </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "column",
-              }}
-            >
-              <Text
+        <StatusBar backgroundColor="#078ECB" style="light"/>
+        {user ? (
+          <ScrollView showsVerticalScrollIndicator={false}>
+
+            <View style={styles.profile}>
+              <TouchableOpacity>
+                <View style={styles.ProfilePicture}>
+                  <Image
+                    source={require("../assets/images/profile-picture.jpg")}
+                    style={styles.ProfilePicture}
+                  />
+                </View>
+                <View style={styles.FeatherIcon}>
+                  <FontAwesome name="camera" size={15} color="white" />
+                  {/* <Feather name="edit" size={15} color="white" /> */}
+                </View>
+              </TouchableOpacity>
+              <View
                 style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  textAlign: "center",
+                  flexDirection: "column",
                 }}
               >
-                Diagui Tounkara
-              </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  textAlign: "center",
-                }}
-              >
-                tounkaradiagui@gmail.com
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  {user.prenom} { user.nom}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    textAlign: "center",
+                  }}
+                >
+                  {/* tounkaradiagui@gmail.com */}
+                  {user.email}
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: 15,
+                    textAlign: "center",
+                  }}
+                >
+                  Dernière connexion:
+                  {user.lastLogin}
+                </Text>
+              
+              </View>
             </View>
-          </View>
-  
-          <View style={{paddingHorizontal:20, borderBottomWidth:1, borderBottomColor:"#078ECB", marginHorizontal:20, marginTop:10}}>
-            <Text style={{fontSize:18, marginLeft:-20}}>Préférences</Text>
-          </View>
-  
-          <View style={styles.dark}>
-            <Ionicons
-                name="sunny"
+    
+            <View style={{paddingHorizontal:20, borderBottomWidth:1, borderBottomColor:"#078ECB", marginHorizontal:20, marginTop:10}}>
+              <Text style={{fontSize:18, marginLeft:-20}}>Préférences</Text>
+            </View>
+    
+            <View style={styles.dark}>
+              <Ionicons
+                  name="sunny"
+                  size={24}
+                  color="#078ECB"
+                  style={{
+                    // backgroundColor: "#078ECB",
+                    borderRadius: 20,
+                    marginLeft:10
+                  }}
+                />
+                <Text style={{
+                    fontSize:18,
+                    marginLeft:-180
+                  }}>Thème 
+                  {/* {darkModeEnabled ? "sombre" : "clair"} */}
+                </Text>
+                <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+                {/* <Switch
+                  value={darkModeEnabled}
+                  onValueChange={toggleSwitch}
+                /> */}
+            </View>
+    
+            <TouchableOpacity
+              style={styles.touchable}
+            >
+              <MaterialIcons
+                name="person"
                 size={24}
                 color="#078ECB"
                 style={{
-                  // backgroundColor: "#078ECB",
+                  justifyContent: "center",
+                  borderRadius: 30,
+                  marginLeft:10
+                }}
+              />
+              <View 
+              >
+                <Text style={{
+                  fontSize:18,
+                  marginLeft:-80
+                }}>Modifier Mon Profil</Text>
+              </View>
+              <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+            </TouchableOpacity>
+    
+            <TouchableOpacity
+            style={styles.touchable}
+            >
+              <FontAwesome
+                name="bell"
+                size={24}
+                color="#078ECB"
+                style={{
                   borderRadius: 20,
                   marginLeft:10
                 }}
               />
-              <Text style={{
+              <View 
+              >
+                <Text style={{
                   fontSize:18,
-                  marginLeft:-180
-                }}>Thème 
-                {/* {darkModeEnabled ? "sombre" : "clair"} */}
-              </Text>
+                  marginLeft:-115
+                }}>Notifications</Text>
+              </View>
               <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-              {/* <Switch
-                value={darkModeEnabled}
-                onValueChange={toggleSwitch}
-              /> */}
-          </View>
-  
-          <TouchableOpacity
+            </TouchableOpacity>
+            <TouchableOpacity
             style={styles.touchable}
-          >
-            <MaterialIcons
-              name="person"
-              size={24}
-              color="#078ECB"
-              style={{
-                justifyContent: "center",
-                borderRadius: 30,
-                marginLeft:10
-              }}
-            />
-            <View 
             >
-              <Text style={{
-                fontSize:18,
-                marginLeft:-80
-              }}>Modifier Mon Profil</Text>
+              <MaterialIcons
+                name="settings"
+                size={24}
+                color="#078ECB"
+                style={{
+                  borderRadius: 20,
+                  marginLeft:10
+                }}
+              />
+              <View 
+              >
+                <Text style={{
+                  fontSize:18,
+                  marginLeft:-115
+                }}>Paramètre</Text>
+                {/* Theme, Modifier mon profil, Changer le mot de passe doivent etre dans parametre */}
+              </View>
+              <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+            </TouchableOpacity>
+    
+            <View style={{paddingHorizontal:20, borderBottomWidth:1, borderBottomColor:"#078ECB", marginHorizontal:20, marginTop:20}}>
+              <Text style={{fontSize:18, marginLeft:-20}}>Aide</Text>
             </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-          </TouchableOpacity>
-  
-          <TouchableOpacity
-          style={styles.touchable}
-          >
-            <FontAwesome
-              name="bell"
-              size={24}
-              color="#078ECB"
-              style={{
-                borderRadius: 20,
-                marginLeft:10
-              }}
-            />
-            <View 
+    
+            <TouchableOpacity
+              style={styles.touchable}
             >
-              <Text style={{
-                fontSize:18,
-                marginLeft:-115
-              }}>Notifications</Text>
-            </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-          style={styles.touchable}
-          >
-            <MaterialIcons
-              name="settings"
-              size={24}
-              color="#078ECB"
-              style={{
-                borderRadius: 20,
-                marginLeft:10
-              }}
-            />
-            <View 
+              <MaterialIcons
+                name="help"
+                size={24}
+                color="#078ECB"
+                style={{
+                  justifyContent: "center",
+                  borderRadius: 30,
+                  marginLeft:10
+                }}
+              />
+              <View 
+              >
+                <Text style={{
+                  fontSize:18,
+                  marginLeft:-115
+                }}>A Propos</Text>
+              </View>
+              <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+            </TouchableOpacity>
+    
+            <TouchableOpacity
+              style={styles.logout}
+              onPress={handleLogout}
             >
-              <Text style={{
-                fontSize:18,
-                marginLeft:-115
-              }}>Paramètre</Text>
-            </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-          </TouchableOpacity>
-  
-          <View style={{paddingHorizontal:20, borderBottomWidth:1, borderBottomColor:"#078ECB", marginHorizontal:20, marginTop:20}}>
-            <Text style={{fontSize:18, marginLeft:-20}}>Aide</Text>
-          </View>
-  
-          <TouchableOpacity
-            style={styles.touchable}
-          >
-            <MaterialIcons
-              name="help"
-              size={24}
-              color="#078ECB"
-              style={{
-                justifyContent: "center",
-                borderRadius: 30,
-                marginLeft:10
-              }}
-            />
-            <View 
-            >
-              <Text style={{
-                fontSize:18,
-                marginLeft:-115
-              }}>Support</Text>
-            </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-          </TouchableOpacity>
-  
-          <TouchableOpacity
-          style={styles.touchable}
-          >
-            <MaterialIcons
-              name="policy"
-              size={24}
-              color="#078ECB"
-              style={{
-                borderRadius: 20,
-                marginLeft:10
-              }}
-            />
-            <View 
-            >
-              <Text style={{
-                fontSize:18,
-                marginLeft:-65
-              }}>Termes et conditions</Text>
-            </View>
-            <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-          </TouchableOpacity>
-  
-         
-          {/* -Préférences
-          Mon Profil
-          Mode Nuit
-          Paramètre
-          -Aide
-          Signaler un problème
-          Nous Contactez
-          Déconnexion */}
+                <SimpleLineIcons name="logout" size={20} color="#078ECB" style={{
+                  borderRadius: 20,
+                  marginLeft:10
+                }}/>
+              <View 
+              >
+                <Text style={{
+                  fontSize:18,
+                  marginLeft:15
+                }}>Déconnexion</Text>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
+        ) : ("Aucun utilisateur connecté" )}
       </SafeAreaView>
+
     );
   };
   
@@ -276,5 +298,17 @@ import {
       borderLeftColor: "#078ECB",
       marginTop:10,
       borderRadius:5
+    },
+    logout:{
+      flexDirection: "row",
+      marginHorizontal: 20,
+      paddingVertical: 10,
+      // justifyContent: "",
+      borderBottomColor: "#078ECB",
+      borderBottomWidth: 1,
+      marginTop:10,
+      borderRadius:5,
+      borderLeftWidth:1,
+      borderLeftColor: "#078ECB",
     }
   });  
