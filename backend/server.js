@@ -12,12 +12,12 @@ const budgetRoutes = require('./routes/budgetRoutes.js');
 
 dotenv.config();
 connectBD();
-
+// Custom Middleware
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-
+// Built-in middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

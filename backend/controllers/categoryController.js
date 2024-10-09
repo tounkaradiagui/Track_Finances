@@ -3,18 +3,13 @@ const User = require('../models/User');
 
 const addCategory = async (req, res) => {
     try {
-        const { userId, name, description } = req.body;
-        
-        // Trouver l'utilisateur
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé" });
-        }
+        const { name, description } = req.body; // Ne pas extraire userId ici
 
         // Vérifier si l'utilisateur est connecté
         if (!req.user || !req.user.userId) {
             return res.status(401).json({ message: "Vous n'êtes pas autorisé à effectuer cette opération. Veuillez vous connecter !" });
         }
+        console.log("Utilisateur connecté : ", req.user);
 
         // Vérifier si le nom de la catégorie est déjà pris
         const existingCategory = await Category.findOne({ name, userId: req.user.userId });
@@ -24,7 +19,7 @@ const addCategory = async (req, res) => {
 
         // Vérifier si les champs requis sont présents
         if (!name) {
-            return res.status(400).json({ message: "le nom de la catégorie est obligatoire" });
+            return res.status(400).json({ message: "Le nom de la catégorie est obligatoire" });
         }
 
         // Créer la catégorie
@@ -60,6 +55,8 @@ const getCategories = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
     }
 };
+
+
 
 const updateCategory = async (req, res) => {
     try {

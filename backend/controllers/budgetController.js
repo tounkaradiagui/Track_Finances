@@ -106,6 +106,6 @@ const deleteBudget = async (req, res) => {
         console.log(error);
         res.status(500).json({message: "Erreur de serveur"});      
     }
-}
+};
 
 module.exports = {createBudget, getBudgets, updateBudget, deleteBudget};

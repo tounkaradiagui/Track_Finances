@@ -2,8 +2,11 @@ import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'reac
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const Transaction = () => {
+
+  const navigation = useNavigation();
 
   const initialTransactions = [
     { id: '1', type: 'Dépense', amount: 50, description: 'Courses' },
@@ -59,8 +62,8 @@ const Transaction = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Liste de transaction</Text>
-        <TouchableOpacity>
+        <Text style={styles.title}>Liste de Transaction</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("AddTransaction")}>
           <AntDesign name="plussquare" size={30} color="#E9B94E" />
         </TouchableOpacity>
       </View>

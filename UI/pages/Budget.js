@@ -3,11 +3,14 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { FontAwesome } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useNavigation } from '@react-navigation/native';
 
 const Budget = () => {
 
+  const navigation = useNavigation();
+
   const budgets = [
-    { id: '1', name: 'Alimentation', amount: 200, icon: 'utensils' },
+    { id: '1', name: 'Alimentation', amount: 200, icon: 'bus' },
     { id: '2', name: 'Transport', amount: 150, icon: 'bus' },
     { id: '3', name: 'Loisirs', amount: 100, icon: 'gamepad' },
     { id: '4', name: 'Épargne', amount: 300, icon: 'bank' },
@@ -29,7 +32,7 @@ const Budget = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Liste de Budgets</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("AddBudget")}>
           <AntDesign name="plussquare" size={30} color="#E9B94E" />
         </TouchableOpacity>
       </View>

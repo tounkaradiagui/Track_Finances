@@ -8,7 +8,7 @@ import {
     Switch
   } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
   
@@ -19,12 +19,78 @@ import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
   
   const Profile = () => {
+    const {user, setUser } = useUser();
+    // Vérifiez si l'utilisateur est chargé
+    if (!user) {
+      return <Text>Chargement...</Text>; // Affichez un message de chargement
+    }
+
+    const navigation = useNavigation();
+    const [loading, setLoading] = useState(true);
+
+    // useEffect(() => {
+    //   const fetchUserData = async () => {
+    //     try {
+    //       const userId = await AsyncStorage.getItem('userId');
+    //       console.log('ID utilisateur récupéré:', userId);
+  
+    //       if (userId) {
+    //         // Vous pouvez ajouter une logique pour récupérer des données supplémentaires sur l'utilisateur ici si nécessaire
+    //       } else {
+    //         console.error('ID utilisateur non trouvé');
+    //       }
+    //     } catch (error) {
+    //       console.error('Erreur lors de la récupération des données utilisateur:', error);
+    //     } finally {
+    //       setLoading(false);
+    //     }
+    //   };
+  
+    //   fetchUserData();
+    // }, []);
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const userData = await AsyncStorage.getItem('authToken');
+          const userId = await AsyncStorage.getItem('userId');
+  
+          if (userData) {
+            const parsedUserData = JSON.parse(userData);
+            setUser({
+              userId: userId,
+              nom: parsedUserData.nom,
+              prenom: parsedUserData.prenom,
+              email: parsedUserData.email,
+              lastLogin: parsedUserData.lastLogin, // Assurez-vous d'avoir cette info
+            });
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données utilisateur:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchUserData();
+  }, [setUser]);
+
+  if (loading) {
+    return <Text>Chargement...</Text>;
+  }
+
+    const formatDate = (isoDate) => {
+      const date = new Date(isoDate);
+      const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+      const formattedDate = date.toLocaleDateString('fr-FR', options);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+      return `${formattedDate} à ${hours}:${minutes}`;
+    };
     // const [darkModeEnabled, setDarkModeEnabled] = useState(false);
     // const toggleSwitch = () => {
     //   setDarkModeEnabled(!darkModeEnabled);
     // };
-    const {user, setUser } = useUser();
-    const navigation = useNavigation();
 
     const handleLogout = () => {
       clearAuthToken();
@@ -86,8 +152,7 @@ import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
                     textAlign: "center",
                   }}
                 >
-                  Dernière connexion:
-                  {user.lastLogin}
+                 Dernière connexion : {formatDate(user.lastLogin)}
                 </Text>
               
               </View>

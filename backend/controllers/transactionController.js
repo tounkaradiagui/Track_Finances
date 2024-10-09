@@ -1,5 +1,6 @@
 const Transaction = require('../models/Transaction')
 
+
 const createTransaction = async (req, res) => {
     try {
         const { type, amount, description } = req.body; // Récupérer les données de la requête

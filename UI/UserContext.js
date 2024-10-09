@@ -1,19 +1,25 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const UserContext = createContext();
+export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState("");
+    const [user, setUser] = useState(null); // Utilisez null au lieu d'une chaîne vide
 
     useEffect(() => {
         const getUserData = async () => {
             const storedToken = await AsyncStorage.getItem('authToken');
-            if (storedToken) {
-                // Décoder le token ou utiliser une fonction pour récupérer l'utilisateur
-                const userData = JSON.parse(storedToken);
-                setUser(userData); // Assurez-vous que le format est correct
+            const userId = await AsyncStorage.getItem('userId');
+            if (storedToken && userId) {
+                const userData = {
+                    userId: userId,
+                    authToken: storedToken,
+                };
+                setUser(userData);
             }
+          
+            console.log('Token:', storedToken);
+            console.log('User ID:', userId);
         };
         getUserData();
     }, []);

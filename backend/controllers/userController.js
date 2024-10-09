@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const User = require("../models/User.js");
-const bcrytpjs = require("bcryptjs");
 const crypto = require("crypto");
+const bcrytp = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/User.js");
 
 const Register = async (req, res) => {
   try {
@@ -65,6 +65,13 @@ const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if(!email || email === "") {
+      return res.status(400).json({ message: "Veuillez entrer votre email" });
+    }
+    if(!password || password === "") {
+      return res.status(400).json({ message: "Veuillez entrer votre mot de passe"});
+    }
+
     // Check if user exist in the database
     const user = await User.findOne({ email });
     if (!user) {
@@ -73,22 +80,30 @@ const Login = async (req, res) => {
         .json({ message: "Ce compte n'existe pas. Veuillez vous inscrire" });
     }
 
-    const isPasswordValid = await bcrytpjs.compare(password, user.password);
+    const isPasswordValid = await bcrytp.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email, nom:user.nom }, secretKey, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id, email: user.email, nom: user.nom }, secretKey, { expiresIn: '7d' });
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Utilisez secure uniquement en production
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
+      secure: process.env.NODE_ENV === "production",
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
+
 
     res.status(200).json({
       message: "Vous êtes connecté",
       token,
-      user,
+      user:{
+        _id:user._id,
+        email:user.email,
+        nom:user.nom,
+        prenom:user.prenom,
+        lastLogin:user.lastLogin
+        // avatar:user.avatar,
+      }
     });
 
   } catch (error) {
