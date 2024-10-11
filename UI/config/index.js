@@ -4,12 +4,14 @@ export const API_URL = {
     register: `${BASE_URL}/api/auth/register`,
     login: `${BASE_URL}/api/auth/login`,
     logout: `${BASE_URL}/api/auth/logout`,
+
     createCategory: `${BASE_URL}/api/auth/user/category`,
     getCategories: `${BASE_URL}/api/auth/user/categories`,
     getCategories: `${BASE_URL}/api/auth/user/categories`,
+
     AddBudget: `${BASE_URL}/api/auth/budget/create`,
+    getBudget: `${BASE_URL}/api/auth/budget/all`,
     
-  // Ajoute d'autres endpoints ici
-  // par exemple:
-  // getUser: `${BASE_URL}/api/user`,
+    getTransactions: `${BASE_URL}/api/auth/transactions`,
+    createTransaction: `${BASE_URL}/api/auth/transaction`,
 };

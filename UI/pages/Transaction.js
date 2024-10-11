@@ -1,62 +1,85 @@
-import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import {FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../config';
 
 const Transaction = () => {
 
   const navigation = useNavigation();
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  
+  const fetchTransactions = async () => {
+    try {
+      await AsyncStorage.getItem('authToken');  
+      const response = await fetch(API_URL.getTransactions, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
-  const initialTransactions = [
-    { id: '1', type: 'Dépense', amount: 50, description: 'Courses' },
-    { id: '2', type: 'Dépense', amount: 15, description: 'Transport' },
-    { id: '3', type: 'Revenu', amount: 300, description: 'Salaire' },
-    { id: '4', type: 'Dépense', amount: 20, description: 'Loisirs' },
-  ];
-
-  const [transactions, setTransactions] = useState(initialTransactions);
-
-  const addTransaction = () => {
-    Alert.prompt(
-      'Ajouter une Transaction',
-      'Entrez le type, le montant et la description (ex: Dépense, 50, Courses)',
-      [
-        {
-          text: 'Annuler',
-          style: 'cancel',
-        },
-        {
-          text: 'Ajouter',
-          onPress: (text) => {
-            const [type, amountStr, description] = text.split(',');
-            const amount = parseFloat(amountStr);
-            if (type && description && !isNaN(amount)) {
-              const newTransaction = {
-                id: (transactions.length + 1).toString(),
-                type: type.trim(),
-                amount,
-                description: description.trim(),
-              };
-              setTransactions([...transactions, newTransaction]);
-            } else {
-              Alert.alert('Erreur', 'Veuillez entrer un type, un montant et une description valides.');
-            }
-          },
-        },
-      ],
-      'plain-text'
-    );
+      // Vérifiez si la réponse est correcte
+      if (!response.ok) { 
+        throw new Error("Erreur lors de la récupération des transactions");
+      }
+      
+      const data = await response.json();
+      setTransactions(data.transactions);
+      // console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+  
+  const fetchCategories = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      const response = await fetch(API_URL.getCategories, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des catégories");
+      }
+  
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (err) {
+      console.error("Erreur lors de la récupération des catégories:", err);
+    }
+  };
+  
+  useEffect(() => {
+    fetchTransactions();
+    fetchCategories();
+  }, []);
+  
 
+  const renderItem = ({ item }) => {
 
-  const renderItem = ({ item }) => (
+    // Cherchez la catégorie correspondante
+    const category = categories.find((cat) => cat._id === item.categoryId);
+    const categoryName = category ? category.name : "Aucune catégorie";
+
+    const formattedAmount = item.type === "depense" ? `- ${item.amount} Franc AES` : `+ ${item.amount} Franc AES`;
+    const amountStyle = item.type === "depense" ? styles.transactionAmountExpense : styles.transactionAmount;
+
+  return (
     <View style={styles.transactionCard}>
       <Text style={styles.transactionType}>{item.type}</Text>
-      <Text style={styles.transactionAmount}>€{item.amount}</Text>
-      <Text style={styles.transactionDescription}>{item.description}</Text>
+      <Text style={amountStyle}>{formattedAmount}</Text>
+      <Text style={styles.transactionDescription}>{categoryName}</Text>
     </View>
   );
+  };
 
 
   return (
@@ -70,7 +93,7 @@ const Transaction = () => {
       <FlatList
         data={transactions}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item._id}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
@@ -82,49 +105,53 @@ export default Transaction
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8F9FA', // Couleur de fond douce
     padding: 20,
-    backgroundColor: '#f9f9f9',
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'space-between', // Pour espacer le bouton et le texte
     marginBottom: 20,
-    marginHorizontal:15
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginLeft: 10,
+    color: '#343A40', // Couleur sombre pour le texte
   },
   transactionCard: {
-    flexDirection: 'column',
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#FFFFFF', // Fond blanc pour les cartes
+    borderRadius: 10,
     padding: 15,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    marginVertical: 5,
+    shadowColor: '#000', // Ombre
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3, // Ombre sur Android
   },
   transactionType: {
     fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#007BFF', // Couleur bleue pour le type de transaction
   },
   transactionAmount: {
-    fontSize: 16,
-    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 5,
+    color: '#28A745', // Couleur verte pour les revenus
+  },
+  transactionAmountExpense: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 5,
+    color: '#DC3545', // Couleur rouge pour les dépenses
   },
   transactionDescription: {
-    fontSize: 14,
-    color: '#fff',
+    fontSize: 16,
+    color: '#6C757D', // Couleur grise pour la description
   },
   separator: {
-    height: 10,
+    height: 10, // Espacement entre les cartes
   },
 });

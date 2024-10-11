@@ -1,7 +1,5 @@
 import StackNavigator from './navigation/StackNavigator';
-import {Provider} from 'react-redux'
-import { StatusBar } from 'expo-status-bar';
-import { UserContext, UserProvider } from './UserContext';
+import { UserProvider } from './UserContext';
 import { NavigationContainer } from '@react-navigation/native';
 
 

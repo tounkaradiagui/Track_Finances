@@ -4,6 +4,7 @@ const connectBD = require('./config/dbConnection');
 const mongoose= require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const path = require('path')
 
 const authRoutes = require('./routes/userRoutes.js');
 const categoryRoutes = require('./routes/categoryRoutes.js');
@@ -24,12 +25,12 @@ app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 const APP_URL = process.env.BASE_URL
 
+
 //Authentication endpoint
 app.use('/api/auth', authRoutes);
 app.use('/api/auth/user', categoryRoutes);
 app.use('/api/auth', transactionRoutes);
 app.use('/api/auth/budget', budgetRoutes);
-
 
 //Pour les requetes des page inexistantes, renvoie la view suivante
 app.all('*',(req, res) => {

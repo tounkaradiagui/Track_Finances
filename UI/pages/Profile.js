@@ -28,52 +28,38 @@ import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
     const navigation = useNavigation();
     const [loading, setLoading] = useState(true);
 
-    // useEffect(() => {
-    //   const fetchUserData = async () => {
-    //     try {
-    //       const userId = await AsyncStorage.getItem('userId');
-    //       console.log('ID utilisateur récupéré:', userId);
-  
-    //       if (userId) {
-    //         // Vous pouvez ajouter une logique pour récupérer des données supplémentaires sur l'utilisateur ici si nécessaire
-    //       } else {
-    //         console.error('ID utilisateur non trouvé');
-    //       }
-    //     } catch (error) {
-    //       console.error('Erreur lors de la récupération des données utilisateur:', error);
-    //     } finally {
-    //       setLoading(false);
-    //     }
-    //   };
-  
-    //   fetchUserData();
-    // }, []);
-
     useEffect(() => {
       const fetchUserData = async () => {
-        try {
-          const userData = await AsyncStorage.getItem('authToken');
-          const userId = await AsyncStorage.getItem('userId');
+          try {
+              const userToken = await AsyncStorage.getItem('authToken');
+              const userId = await AsyncStorage.getItem('userId');
   
-          if (userData) {
-            const parsedUserData = JSON.parse(userData);
-            setUser({
-              userId: userId,
-              nom: parsedUserData.nom,
-              prenom: parsedUserData.prenom,
-              email: parsedUserData.email,
-              lastLogin: parsedUserData.lastLogin, // Assurez-vous d'avoir cette info
-            });
+              if (userToken) {
+                  // Récupérer les informations utilisateur
+                  const userData = await AsyncStorage.getItem('userInfo');
+                  const parsedUserData = JSON.parse(userData); // Ici, vous devez parser les données utilisateur
+  
+                  if (parsedUserData) {
+                      setUser({
+                          userId: userId,
+                          nom: parsedUserData.nom,
+                          prenom: parsedUserData.prenom,
+                          email: parsedUserData.email,
+                          lastLogin: parsedUserData.lastLogin
+                      });
+                  } else {
+                      console.error('Aucune donnée utilisateur trouvée.');
+                  }
+              }
+          } catch (error) {
+              console.error('Erreur lors de la récupération des données utilisateur:', error);
+          } finally {
+              setLoading(false);
           }
-        } catch (error) {
-          console.error('Erreur lors de la récupération des données utilisateur:', error);
-        } finally {
-          setLoading(false);
-        }
       };
       fetchUserData();
   }, [setUser]);
-
+  
   if (loading) {
     return <Text>Chargement...</Text>;
   }

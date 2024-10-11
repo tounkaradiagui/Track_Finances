@@ -1,21 +1,92 @@
 const Transaction = require('../models/Transaction')
+const Budget = require('../models/Budget');
+
+
+// const createTransaction = async (req, res) => {
+//     try {
+//         const { type, amount, description } = req.body; // Récupérer les données de la requête
+
+//         // Vérifier que l'utilisateur est connecté
+//         if (!req.user || !req.user.userId) {
+//             return res.status(401).json({ message: "Accès refusé. Vous devez être connecté." });
+//         }
+
+//         // Créer une nouvelle transaction
+//         const newTransaction = new Transaction({
+//             userId: req.user.userId, // Associer la transaction à l'utilisateur connecté
+//             type,
+//             amount,
+//             description,
+//         });
+
+//         // Enregistrer la nouvelle transaction
+//         await newTransaction.save();
+
+//         res.status(201).json({ message: "Transaction ajoutée avec succès", transaction: newTransaction });
+//     } catch (error) {
+//         console.log("Erreur : ", error);
+//         res.status(500).json({ message: "Erreur lors de l'ajout de la transaction." });
+//     }
+// };
+
 
 
 const createTransaction = async (req, res) => {
     try {
-        const { type, amount, description } = req.body; // Récupérer les données de la requête
+        const { type, amount, description, categoryId, budgetId } = req.body;
 
         // Vérifier que l'utilisateur est connecté
         if (!req.user || !req.user.userId) {
             return res.status(401).json({ message: "Accès refusé. Vous devez être connecté." });
         }
 
+        // Valider les champs requis
+        if (!amount) {
+            return res.status(400).json({ message: "Le montant est obligatoire." });
+        }
+        if (!type) {
+            return res.status(400).json({ message: "Veuillez choisir le type de la Transaction." });
+        }
+        if (!categoryId) {
+            return res.status(400).json({ message: "Veuillez selectionner une catégorie." });
+        }
+        if (!budgetId) {
+            return res.status(400).json({ message: "Veuillez choisir un budget." });
+        }
+
+        // Vérifier si la transaction est une dépense
+        if (type === 'depense') {
+            const budget = await Budget.findById(budgetId);
+            if (!budget) {
+                return res.status(404).json({ message: "Budget non trouvé." });
+            }
+            if (budget.amount < amount) {
+                return res.status(400).json({ message: "Le montant de la dépense dépasse le budget disponible." });
+            }
+
+            // Mettre à jour le montant du budget
+            budget.amount -= amount;
+            await budget.save();
+        } 
+        // Vérifier si la transaction est un revenu
+        if (type === 'revenu') {
+            const budget = await Budget.findById(budgetId);
+            if (!budget) {
+                return res.status(404).json({ message: "Budget non trouvé." });
+            }
+            // Mettre à jour le montant du budget
+            budget.amount += amount;
+            await budget.save();
+        }        
+
         // Créer une nouvelle transaction
         const newTransaction = new Transaction({
-            userId: req.user.userId, // Associer la transaction à l'utilisateur connecté
+            userId: req.user.userId,
             type,
             amount,
             description,
+            categoryId,
+            budgetId,
         });
 
         // Enregistrer la nouvelle transaction
@@ -27,6 +98,8 @@ const createTransaction = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de l'ajout de la transaction." });
     }
 };
+
+
 
 const getTransactions = async (req, res) => {
     try {

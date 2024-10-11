@@ -9,7 +9,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   FontAwesome5,
-  FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +22,7 @@ const Categories = () => {
 
   const fetchCategories = async () => {
     await AsyncStorage.getItem("authToken");
+    await AsyncStorage.getItem("userId");
 
     try {
       const response = await fetch(API_URL.getCategories, {
@@ -49,7 +49,7 @@ const Categories = () => {
 
   useEffect(() => {
     fetchCategories();
-  });
+  }, [categories]);
 
   return (
     <SafeAreaView>

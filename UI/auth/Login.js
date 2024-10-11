@@ -35,66 +35,62 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (userId) => {
+  const handleLogin = async () => {
     const currentDate = new Date();
     setLoading(true);
     try {
-      const userData = {
-        email: email,
-        password: password,
-        lastLogin: currentDate
-      };
+        const userData = {
+            email,
+            password,
+            lastLogin: currentDate,
+        };
 
-      const response = await fetch(
-        API_URL.login,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
+        const response = await fetch(API_URL.login, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+        });
+
+        // Vérifier si la réponse est correcte
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Erreur de connexion");
         }
-      );
 
-      // Vérifier si la réponse est correcte
-      if (!response.ok) {
-        const errorData = await response.json(); // Essaye de récupérer des informations sur l'erreur
-        throw new Error(errorData.message || "Erreur de connexion");
-      }
+        const data = await response.json();
+        console.log("Données de l’utilisateur:", data);
+        setLoading(false);
 
-      const data = await response.json();
-      console.log("Données de l’utilisateur:", data);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Stocker le token ou les informations de l'utilisateur dans AsyncStorage
-      // await AsyncStorage.setItem("authToken", data.token);
-      // await AsyncStorage.setItem("userId", data.user._id);
-      setLoading(false);
+        // Stocker le token
+        await AsyncStorage.setItem('authToken', data.token);
+        
+        // Stocker les informations utilisateur
+        const userInfos = {
+            userId: data.user._id,
+            nom: data.user.nom,
+            prenom: data.user.prenom,
+            email: data.user.email,
+            lastLogin: currentDate,
+        };
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfos));
+        setUser(userInfos);
+        console.log(userInfos);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const userInfos = {
-        userId: data.user._id,
-        nom: data.user.nom,
-        prenom: data.user.prenom,
-        email: data.user.email,
-        lastLogin: currentDate
-        // avatar: data.user.avatar,
-      };
-      // Stocker les informations de l'utilisateur dans AsyncStorage
-      await AsyncStorage.setItem('authToken', JSON.stringify(userInfos)); 
-      await AsyncStorage.setItem('userId', userInfos.userId);
-      setUser(userInfos);
-      console.log(userInfos);
-
-      // Naviguer vers l'écran principal ou faire autre chose après la connexion
-      navigation.navigate("ProtectedData");
-      Alert.alert("Connexion réussie", "Bienvenue !");
+        // Naviguer vers l'écran principal
+        navigation.navigate("ProtectedData");
+        Alert.alert("Connexion réussie", "Bienvenue !");
     } catch (error) {
-      console.error(error);
+        console.error(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
+
 
   return (
     <SafeAreaView>
