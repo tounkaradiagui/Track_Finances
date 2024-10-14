@@ -7,10 +7,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  FontAwesome5,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
@@ -45,7 +42,6 @@ const Categories = () => {
       console.error("Erreur: ", error.message);
     }
   };
-  
 
   useEffect(() => {
     fetchCategories();
@@ -108,63 +104,75 @@ const Categories = () => {
               Liste de Catégorie
             </Text>
           </View>
-          {categories?.map((item, index) => (
-            <View key={index}>
-              <View
-                style={{
-                  paddingHorizontal: 15,
-                  padding: 10,
-                  marginTop: 20,
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  backgroundColor: "#078ECB",
-                  marginHorizontal: 20,
-                }}
-              >
-                <View>
-                  <View style={{ flexDirection: "row" }}>
-                    <FontAwesome5 name="house-damage" size={24} color="white" />
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        color: "white",
-                        marginLeft: 10,
-                      }}
-                    >
-                      {item.name}
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: "row", marginTop: 5 }}>
-                    {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date</Text> */}
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        fontWeight: "bold",
-                        color: "white",
-                        marginLeft: 10,
-                      }}
-                    >
-                      {/* Date de création : {new Date(item.createdAt).toLocaleDateString()} */}
-                      Date de création :{" "}
-                      {new Date(item.createdAt).toLocaleString("fr-FR", {
-                        day: "numeric",
-                        month: "numeric",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                      })}
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
-                >
-                  {/* $2500                 */}
-                </Text>
-              </View>
+          {categories.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Aucune catégorie disponible</Text>
             </View>
-          ))}
+          ) : (
+            categories.map((item, index) => (
+              <View key={index}>
+                <View
+                  style={{
+                    paddingHorizontal: 15,
+                    padding: 10,
+                    marginTop: 20,
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    backgroundColor: "#078ECB",
+                    marginHorizontal: 20,
+                  }}
+                >
+                  <View>
+                    <View style={{ flexDirection: "row" }}>
+                      <FontAwesome5
+                        name="house-damage"
+                        size={24}
+                        color="white"
+                      />
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "white",
+                          marginLeft: 10,
+                        }}
+                      >
+                        {item.name}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", marginTop: 5 }}>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          fontWeight: "bold",
+                          color: "white",
+                          marginLeft: 10,
+                        }}
+                      >
+                        Date de création :{" "}
+                        {new Date(item.createdAt).toLocaleString("fr-FR", {
+                          day: "numeric",
+                          month: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                        })}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#E9B94E",
+                    }}
+                  >
+                    {/* Montant ou autre info, si nécessaire */}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
 
           <View
             style={{
@@ -386,4 +394,15 @@ const Categories = () => {
 
 export default Categories;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#999',
+  },
+});

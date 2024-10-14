@@ -27,7 +27,7 @@ const Register = async (req, res) => {
     }
 
     //hasher le mot de passe des utilisateurs pour la sécurité de comptes
-    const hashedPassword = await bcrytpjs.hash(password, 10);
+    const hashedPassword = await bcrytp.hash(password, 10);
 
     const newUser = new User({
       nom: nom,

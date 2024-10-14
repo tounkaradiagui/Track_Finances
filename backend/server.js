@@ -13,6 +13,7 @@ const budgetRoutes = require('./routes/budgetRoutes.js');
 
 dotenv.config();
 connectBD();
+
 // Custom Middleware
 const app = express();
 app.use(express.json());
@@ -24,7 +25,6 @@ app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
 const APP_URL = process.env.BASE_URL
-
 
 //Authentication endpoint
 app.use('/api/auth', authRoutes);
@@ -42,6 +42,11 @@ app.all('*',(req, res) => {
     } else {
         res.type('txt').send('404 Not found')
     }
+});
+
+// Custom message if backend work as expected
+app.get('/', (req, res) => {
+    res.send('Le Backend est Prêt');
 });
 
 // Connexion à la base de données

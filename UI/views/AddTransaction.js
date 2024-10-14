@@ -242,7 +242,7 @@ const AddTransaction = () => {
         }}
       >
         <Text style={{ color: "white", fontWeight: "bold" }}>
-          Créer Catégorie
+          Créer Transaction
         </Text>
       </TouchableOpacity>
     </View>

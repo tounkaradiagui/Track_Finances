@@ -99,9 +99,7 @@ const Budget = () => {
           <FontAwesome name={item.icon || "money"} size={24} color="#fff" />
         </View>
         <View style={styles.details}>
-          <Text style={styles.itemName}>
-            {categoryName}
-          </Text>
+          <Text style={styles.itemName}>{categoryName}</Text>
           <Text style={styles.itemCategory}>
             {item.amount
               ? `${item.amount} Franc AES`
@@ -120,12 +118,18 @@ const Budget = () => {
           <AntDesign name="plussquare" size={30} color="#E9B94E" />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={budget}
-        renderItem={renderBudgetItem}
-        keyExtractor={(item) => item._id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+      {budget.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Aucun budget disponible</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={budget}
+          renderItem={renderBudgetItem}
+          keyExtractor={(item) => item._id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -144,6 +148,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
     marginHorizontal: 15,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#999',
   },
   title: {
     fontSize: 18,

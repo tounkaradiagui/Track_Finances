@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { API_URL } from './../config/index';
 
 const Register = () => {
 
@@ -41,7 +42,7 @@ const Register = () => {
         confirmPassword: confirmPassword
       };
 
-      const response = await fetch(`http://192.168.106.140:5000/api/auth/register`, {
+      const response = await fetch(API_URL.register, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,12 +52,18 @@ const Register = () => {
 
       if(!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur de connexion');
+        throw new Error(errorData.message || 'Erreur de inscription');
       }
 
       const data = await response.json();
       console.log(data);
-      Alert.alert('Connexion réussie', 'Bienvenue !');
+      setNom("");
+      setPrenom("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      navigation.navigate('Login');
+      Alert.alert('Inscription réussie', 'Bienvenue !');
     } catch (error) {
       console.log(error);
     }

@@ -10,6 +10,8 @@ import CreateCategory from '../views/CreateCategory';
 import Target from '../views/Target';
 import AddTransaction from '../views/AddTransaction';
 import AddBudget from '../views/AddBudget';
+import Settings from '../pages/Settings';
+import About from '../pages/About';
 
 const ProtectedData = () => {
     const Stack = createNativeStackNavigator();
@@ -21,6 +23,8 @@ const ProtectedData = () => {
             <Stack.Screen name="Categories" component={Categories} options={{ headerShown: false }} />
             <Stack.Screen name="Budget" component={Budget} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+            <Stack.Screen name="Settings" component={Settings} options={{ title: 'Paramètre'}}/>
+            <Stack.Screen name="About" component={About} options={{ title: 'A Propos'}}/>
 
             {/* Manage categories */}
             <Stack.Screen name="CreateCategory" component={CreateCategory} options={{ title: 'Catégorie'}}/>
