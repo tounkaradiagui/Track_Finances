@@ -25,6 +25,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
+app.use('/', require('./routes/defaultRoute.js'));
 
 
 const PORT = process.env.PORT || 3000;

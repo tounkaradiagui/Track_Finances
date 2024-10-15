@@ -3,6 +3,10 @@ const crypto = require("crypto");
 const bcrytp = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
+const dotenv = require('dotenv')
+
+// const { check, validationResult } = require("express-validator");
+dotenv.config();
 
 const Register = async (req, res) => {
   try {
@@ -52,14 +56,18 @@ const Register = async (req, res) => {
   }
 };
 
+// ####################################
 // Generate a secret key
-const generateSecretKey = () => {
-  const secret = crypto.randomBytes(32).toString("hex");
-  return secret;
-};
+// const generateSecretKey = () => {
+//   const secret = crypto.randomBytes(32).toString("hex");
+//   return secret;
+// };
 
 // Create a secret key
-const secretKey = generateSecretKey();
+// const secretKey = generateSecretKey();
+// ######################################
+
+const secretKey = process.env.TOKEN_SECRET_KEY
 
 const Login = async (req, res) => {
   try {
