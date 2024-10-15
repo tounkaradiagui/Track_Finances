@@ -52,7 +52,7 @@ const Transaction = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       } else {
         const data = await response.json();
         setCategories(data.categories || []);

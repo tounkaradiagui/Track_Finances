@@ -1,5 +1,4 @@
 const Category = require('../models/Category');
-const User = require('../models/User');
 
 const addCategory = async (req, res) => {
     try {
@@ -45,7 +44,7 @@ const getCategories = async (req, res) => {
 
         // Vérifier si l'utilisateur n'a pas de catégories
         if (categories.length === 0) {
-            return res.status(404).json({ message: "Aucune catégorie trouvée pour cet utilisateur." });
+            return res.status(404).json({ message: "Aucune catégorie disponible." });
         }
 
         // Retourner les catégories

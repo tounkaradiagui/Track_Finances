@@ -20,7 +20,7 @@ const Categories = () => {
   const fetchCategories = async () => {
     await AsyncStorage.getItem("authToken");
     await AsyncStorage.getItem("userId");
-
+  
     try {
       const response = await fetch(API_URL.getCategories, {
         method: "GET",
@@ -28,24 +28,24 @@ const Categories = () => {
           "Content-Type": "application/json",
         },
       });
-
+  
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       }
-
+  
       // Parsez la réponse JSON
       const data = await response.json();
-
       setCategories(data.categories || []);
     } catch (error) {
       console.error("Erreur: ", error.message);
     }
   };
-
+  
   useEffect(() => {
     fetchCategories();
-  }, [categories]);
+  }, []);
+
 
   return (
     <SafeAreaView>

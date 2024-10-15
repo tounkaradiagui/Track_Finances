@@ -14,13 +14,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+
 import { useUser } from "../UserContext";
 import { StatusBar } from "expo-status-bar";
 import { API_URL } from "../config";
+import Toast from "react-native-toast-message";
 
 const Login = () => {
-  // const APP_URL = process.env.APP_URL;
-  // PORT = process.env.PORT;
   const { setUser } = useUser();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -35,62 +36,143 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour valider l'email
+    return emailRegex.test(email);
+  };
+
+  const isValidPassword = (password) => {
+    return password.length >= 4; // Exemple : mot de passe doit avoir au moins 6 caractères
+  };
+
   const handleLogin = async () => {
     const currentDate = new Date();
     setLoading(true);
-    try {
-        const userData = {
-            email,
-            password,
-            lastLogin: currentDate,
-        };
 
-        const response = await fetch(API_URL.login, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userData),
-        });
-
-        // Vérifier si la réponse est correcte
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Erreur de connexion");
-        }
-
-        const data = await response.json();
-        console.log("Données de l’utilisateur:", data);
-        setLoading(false);
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Stocker le token
-        await AsyncStorage.setItem('authToken', data.token);
-        
-        // Stocker les informations utilisateur
-        const userInfos = {
-            userId: data.user._id,
-            nom: data.user.nom,
-            prenom: data.user.prenom,
-            email: data.user.email,
-            lastLogin: currentDate,
-        };
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfos));
-        setUser(userInfos);
-        console.log(userInfos);
-
-        // Naviguer vers l'écran principal
-        navigation.navigate("ProtectedData");
-        Alert.alert("Connexion réussie", "Bienvenue !");
-    } catch (error) {
-        console.error(error);
-    } finally {
-        setLoading(false);
+    // Vérifier la connexion Internet
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Toast.show({
+        text1: "Erreur de connexion",
+        text2: "Veuillez vérifier votre connexion Internet.",
+        type: "error",
+        position: 'top', // 'top', 'bottom', 'center'
+        visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
+      setLoading(false);
+      return;
     }
-};
 
+    // Vérifier si les champs sont remplis
+    if (!email) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez entrer votre email.",
+        type: "error",
+        position: 'top', // 'top', 'bottom', 'center'
+        visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
 
+      setLoading(false);
+      return;
+    }
+
+    // Validation de l'email
+    if (!isValidEmail(email)) {
+      Toast.show({
+          text1: "Erreur",
+          text2: "Veuillez entrer un email valide.",
+          type: "error",
+          position: 'top', // 'top', 'bottom', 'center'
+          visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!password) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez entrer votre votre mot de passe.",
+        type: "error",
+        position: 'top', // 'top', 'bottom', 'center'
+        visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      Toast.show({
+          text1: "Erreur",
+          text2: "Le mot de passe doit contenir au moins 4 caractères.",
+          type: "error",
+          position: 'top', // 'top', 'bottom', 'center'
+          visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userData = {
+        email,
+        password,
+        lastLogin: currentDate,
+      };
+
+      const response = await fetch(API_URL.login, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      // Vérifier si la réponse est correcte
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erreur de connexion");
+      }
+
+      const data = await response.json();
+      console.log("Données de l’utilisateur:", data);
+      setLoading(false);
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Stocker le token
+      await AsyncStorage.setItem("authToken", data.token);
+      await AsyncStorage.setItem("userId", data.user._id);
+      console.log("ID utilisateur stocké :", data.user._id);
+
+      // Stocker les informations utilisateur
+      const userInfos = {
+        userId: data.user._id,
+        nom: data.user.nom,
+        prenom: data.user.prenom,
+        email: data.user.email,
+        lastLogin: currentDate,
+      };
+      await AsyncStorage.setItem("userInfo", JSON.stringify(userInfos));
+      setUser(userInfos);
+      console.log(userInfos);
+
+      // Naviguer vers l'écran principal
+      navigation.navigate("ProtectedData");
+      Alert.alert("Connexion réussie", "Bienvenue !");
+    } catch (error) {
+      console.error(error);
+      Toast.show({
+        text1: "Erreur",
+        text2:
+          error.message || "Une erreur s'est produite, veuillez réessayer.",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView>
@@ -278,5 +360,3 @@ const Login = () => {
 };
 
 export default Login;
-
-const styles = StyleSheet.create({});

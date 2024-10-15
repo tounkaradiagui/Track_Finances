@@ -8,7 +8,7 @@ const SettingsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('EditProfile')}>
         <Text style={styles.optionText}>Modifier mon profil</Text>
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity>

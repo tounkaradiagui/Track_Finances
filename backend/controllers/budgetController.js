@@ -6,12 +6,6 @@ const createBudget = async (req, res) => {
     try {
         const {userId, categoryId, period, amount, description} = req.body;
 
-        // Vérifier si l'utilisateur existe:
-        const user = await User.findById(userId);
-        if (!user) {
-            res.status(404).json({message: "Utilisateur non trouvé"});
-        }
-
         // vérifier si l'utilisateur est connecté:
         if(!req.user || !req.user.userId) {
             return res.status(401).json({message: "Vous devez être connecté pour ajouter un budget"});

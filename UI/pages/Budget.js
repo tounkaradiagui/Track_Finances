@@ -71,7 +71,7 @@ const Budget = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       }
 
       const data = await response.json();

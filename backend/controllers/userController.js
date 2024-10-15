@@ -155,6 +155,31 @@ const UpdateUserProfile = async (req, res) => {
   }
 };
 
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Vérifiez si userId est une chaîne valide avant de faire la requête
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "ID utilisateur invalide" });
+    }
+
+    const user = await User.findById(userId).select('nom prenom email'); // Récupérer uniquement les champs nécessaires
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Exclure le mot de passe et le type d'utilisateur de la réponse
+    const { password, userType, createdAt, ...userResponse } = user.toObject();
+    res.status(200).json(userResponse);
+  } catch (error) {
+    console.error("Erreur: ", error);
+    res.status(500).json({ message: "Erreur de serveur" });
+  }
+};
+
+
 const Logout = async (req, res) => {
   try {
     res
@@ -252,6 +277,7 @@ module.exports = {
   Register,
   Login,
   UpdateUserProfile,
+  getUserProfile,
   DeleteUserAccount,
   ForgotPassword,
   secretKey,
