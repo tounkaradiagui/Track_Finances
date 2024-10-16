@@ -49,11 +49,6 @@ app.all('*',(req, res) => {
     }
 });
 
-// Custom message if backend work as expected
-app.get('/', (req, res) => {
-    res.send('Le Backend est Prêt');
-});
-
 // Connexion à la base de données
 mongoose.connection.once('open', () => {
     console.log('App connected to MongoDB')
