@@ -5,13 +5,13 @@ const mongoose= require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path')
-const cors = require('cors')
+// const cors = require('cors')
 
 const authRoutes = require('./routes/userRoutes.js');
 const categoryRoutes = require('./routes/categoryRoutes.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
 const budgetRoutes = require('./routes/budgetRoutes.js');
-const corsOptions = require('./config/corsOptions.js');
+// const corsOptions = require('./config/corsOptions.js');
 
 dotenv.config();
 connectBD();
@@ -24,7 +24,7 @@ app.use(cookieParser());
 // Built-in middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use('/', require('./routes/defaultRoute.js'));
 
 
