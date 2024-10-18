@@ -13,10 +13,14 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUser } from "../UserContext";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { API_URL } from "../config";
+import { useUser } from "../UserContext";
+
+import NetInfo from "@react-native-community/netinfo";
+import Toast from "react-native-toast-message";
 
 const Login = () => {
   // const APP_URL = process.env.APP_URL;
@@ -35,9 +39,84 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour valider l'email
+    return emailRegex.test(email);
+  };
+
+  const isValidPassword = (password) => {
+    return password.length >= 4; // Exemple : mot de passe doit avoir au moins 4 caractères
+  };
+
   const handleLogin = async () => {
     const currentDate = new Date();
     setLoading(true);
+
+    // Vérifier la connexion Internet
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Toast.show({
+        text1: "Erreur de connexion",
+        text2: "Veuillez vérifier votre connexion Internet.",
+        type: "error",
+        position: 'top',
+        visibilityTime: 3000, // Durée d'affichage en millisecondes
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Vérifier si les champs sont remplis
+    if(!email) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez entrer votre email.",
+        type: "error",
+        position: 'top',
+        visibilityTime: 3000, 
+      });
+
+      setLoading(false);
+      return;
+    }
+
+    // Validation de l'email
+    if (!isValidEmail(email)) {
+      Toast.show({
+          text1: "Erreur",
+          text2: "Veuillez entrer un email valide.",
+          type: "error",
+          position: 'top',
+          visibilityTime: 3000, 
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!password) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez entrer votre votre mot de passe.",
+        type: "error",
+        position: 'top',
+        visibilityTime: 3000, 
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      Toast.show({
+          text1: "Erreur",
+          text2: "Le mot de passe doit contenir au moins 4 caractères.",
+          type: "error",
+          position: 'top',
+          visibilityTime: 3000, 
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
         const userData = {
             email,
@@ -56,7 +135,15 @@ const Login = () => {
         // Vérifier si la réponse est correcte
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Erreur de connexion");
+            Toast.show({
+              text1: "Erreur",
+              text2: errorData.message,
+              type: "error",
+              position: 'top',
+              visibilityTime: 3000, 
+          });
+          setLoading(false);
+          return;
         }
 
         const data = await response.json();
@@ -67,6 +154,8 @@ const Login = () => {
 
         // Stocker le token
         await AsyncStorage.setItem('authToken', data.token);
+        await AsyncStorage.setItem("userId", data.user._id);
+        console.log("ID utilisateur stocké :", data.user._id);
         
         // Stocker les informations utilisateur
         const userInfos = {

@@ -8,8 +8,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -31,7 +31,7 @@ const Categories = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       }
 
       // Parsez la réponse JSON
@@ -45,7 +45,14 @@ const Categories = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [categories]);
+  }, []);
+
+    //refresh the addresses when the component comes to the focus ie basically when we navigate back
+    useFocusEffect(
+      useCallback(() => {
+        fetchCategories();
+      }, [])
+    );
 
   return (
     <SafeAreaView>

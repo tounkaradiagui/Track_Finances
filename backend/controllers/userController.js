@@ -26,6 +26,11 @@ const Register = async (req, res) => {
         });
     }
 
+    // Vérifier si le mot de passe et le mot de passe confirmé sont identiques
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Les mots de passe ne correspondent pas." });
+    }
+
     //hasher le mot de passe des utilisateurs pour la sécurité de comptes
     const hashedPassword = await bcrytp.hash(password, 10);
 
