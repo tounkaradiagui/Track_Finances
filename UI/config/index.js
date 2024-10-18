@@ -8,7 +8,6 @@ export const API_URL = {
 
     createCategory: `${BASE_URL}/api/auth/user/category`,
     getCategories: `${BASE_URL}/api/auth/user/categories`,
-    getCategories: `${BASE_URL}/api/auth/user/categories`,
 
     AddBudget: `${BASE_URL}/api/auth/budget/create`,
     getBudget: `${BASE_URL}/api/auth/budget/all`,
@@ -16,6 +15,10 @@ export const API_URL = {
     getTransactions: `${BASE_URL}/api/auth/transactions`,
     createTransaction: `${BASE_URL}/api/auth/transaction`,
 
+<<<<<<< HEAD
     editUserProfile: `${BASE_URL}/api/auth/user/profile/${userId}`
     
+=======
+    editUserProfile: `${BASE_URL}/api/auth/user/profile`
+>>>>>>> master
 };

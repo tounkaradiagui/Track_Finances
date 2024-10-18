@@ -18,12 +18,12 @@ const SettingsScreen = () => {
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity> */}
 
-      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Security')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
         <Text style={styles.optionText}>Sécurité</Text>
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('PrivacyPolicy')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
         <Text style={styles.optionText}>Politique de confidentialité</Text>
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity>

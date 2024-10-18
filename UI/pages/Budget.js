@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { API_URL } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -39,9 +39,7 @@ const Budget = () => {
       });
 
       if (!response.ok) {
-        throw new Error(
-          response.statusText || "Erreur lors de la récupération des budgets"
-        );
+        return;
       }
 
       // Trier les budgets par montant de façon décroissante
@@ -85,6 +83,13 @@ const Budget = () => {
     fetchBudgets();
     fetchCategories();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+      fetchBudgets();
+    }, [])
+  );
 
   const renderBudgetItem = ({ item }) => {
     // console.log("Item budget:", item); // Vérifiez les données de l'item

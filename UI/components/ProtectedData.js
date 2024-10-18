@@ -24,6 +24,7 @@ const ProtectedData = () => {
             <Stack.Screen name="Categories" component={Categories} options={{ headerShown: false }} />
             <Stack.Screen name="Budget" component={Budget} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+            <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Profil' }} />
             <Stack.Screen name="Settings" component={Settings} options={{ title: 'Paramètre'}}/>
             <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Mon Profil'}}/>
 

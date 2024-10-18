@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../config";
 
@@ -29,7 +29,7 @@ const Transaction = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des transactions");
+        return;
       }
 
       const data = await response.json();
@@ -67,6 +67,13 @@ const Transaction = () => {
     fetchTransactions();
     fetchCategories();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+      fetchTransactions();
+    }, [])
+  );
 
   const renderTransactionItem = ({ item }) => {
     // Cherchez la catégorie correspondante

@@ -8,74 +8,28 @@ import {
   Switch,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../UserContext";
 
-import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useTheme } from "../context/ThemeContext";
 
 const Profile = () => {
   const { user, setUser } = useUser();
-  // Vérifiez si l'utilisateur est chargé
-  if (!user) {
-    return <Text>Chargement...</Text>; // Affichez un message de chargement
-  }
-
-  // const { darkModeEnabled } = useTheme();
-  const { darkModeEnabled, toggleTheme } = useTheme();
-
-
+  const { darkModeEnabled } = useTheme();
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userToken = await AsyncStorage.getItem("authToken");
-        const userId = await AsyncStorage.getItem("userId");
-
-        if (userToken) {
-          // Récupérer les informations utilisateur
-          const userData = await AsyncStorage.getItem("userInfo");
-          const parsedUserData = JSON.parse(userData); // Ici, vous devez parser les données utilisateur
-
-          if (parsedUserData) {
-            setUser({
-              userId: userId,
-              nom: parsedUserData.nom,
-              prenom: parsedUserData.prenom,
-              email: parsedUserData.email,
-              lastLogin: parsedUserData.lastLogin,
-            });
-          } else {
-            console.error("Aucune donnée utilisateur trouvée.");
-          }
-        }
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des données utilisateur:",
-          error
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, [setUser]);
-
-  if (loading) {
+  if (!user) {
     return <Text>Chargement...</Text>;
   }
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const options = {
-      // weekday: "short",
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -86,10 +40,6 @@ const Profile = () => {
 
     return `${formattedDate} à ${hours}:${minutes}`;
   };
-  // const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-  // const toggleSwitch = () => {
-  //   setDarkModeEnabled(!darkModeEnabled);
-  // };
 
   const handleLogout = () => {
     clearAuthToken();
@@ -98,8 +48,8 @@ const Profile = () => {
   const clearAuthToken = async () => {
     await AsyncStorage.removeItem("authToken");
     console.log("Token removed");
-    setUser("");
-    navigation.navigate("PublicScreen");
+    setUser(null);
+    navigation.navigate("PublicScreen", { screen: "Login" });
   };
 
   return (
@@ -110,7 +60,6 @@ const Profile = () => {
       ]}
     >
       <StatusBar backgroundColor="#078ECB" style="light" />
-      {user ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.profile}>
             <TouchableOpacity>
@@ -275,9 +224,6 @@ const Profile = () => {
             />
           </TouchableOpacity>
         </ScrollView>
-      ) : (
-        "Aucun utilisateur connecté"
-      )}
     </SafeAreaView>
   );
 };
