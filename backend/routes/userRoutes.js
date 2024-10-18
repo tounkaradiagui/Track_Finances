@@ -11,7 +11,7 @@ router.get('/test', (req, res) => {
 router.post('/register', Register);
 router.post('/login', Login);
 router.post('/logout', Logout);
-router.put('/user/profile/:userId', authMiddleware, UpdateUserProfile);
+router.patch('/user/profile/:userId', authMiddleware, UpdateUserProfile);
 router.delete('/user/profile/:userId', authMiddleware, DeleteUserAccount);
 router.post('/user/forgot-password/:token', authMiddleware, ForgotPassword);
 router.post('/user/reset-password/:token', authMiddleware, ResetPassword);

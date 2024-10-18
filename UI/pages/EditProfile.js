@@ -12,8 +12,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../config";
 import NetInfo from "@react-native-community/netinfo";
 import Toast from "react-native-toast-message";
+import { useUser } from "../UserContext";
 
 const EditProfile = () => {
+  const { user, setUser } = useUser();
+  if (!user) {
+    return <Text>Chargement...</Text>; // Affichez un message de chargement
+  }
+
   const navigation = useNavigation();
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
@@ -22,22 +28,44 @@ const EditProfile = () => {
   // Fonction pour enregistrer les modifications
   const handleSave = async () => {
     const userId = await AsyncStorage.getItem("userId");
+
+    if (!prenom || !nom || !email) {
+      Toast.show({
+        type: "error",
+        text1: "Erreur de validation",
+        text2: "Tous les champs doivent être remplis.",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
     const userData = {
       id: userId,
       prenom: prenom,
       nom: nom,
       email: email,
     };
+
+    console.log("Données utilisateur à mettre à jour :", userData);
+
     if (userId) {
       try {
-        const response = await fetch(API_URL.editUserProfile, {
+        const response = await fetch(`${API_URL.editUserProfile}/${userId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(userData),
         });
+
+        // const responseText = await response.text(); // Récupère la réponse sous forme de texte
+        // console.log("Réponse de l'API :", responseText); // Affiche la réponse
         
+        // Essayez de parser la réponse JSON
+        const data = await response.json();
+        console.log(data);
+
         if (!response.ok) {
           Toast.show({
             type: "error",
@@ -46,10 +74,16 @@ const EditProfile = () => {
             position: "top",
             visibilityTime: 3000,
           });
+          return;
         }
 
-        const data = await response.json();
-        console.log(data);
+        // Mettez à jour le contexte avec les nouvelles informations de l'utilisateur
+        setUser((prev) => ({
+          ...prev,
+          prenom: data.user.prenom,
+          nom: data.user.nom,
+          email: data.user.email,
+        }));
 
         Toast.show({
           type: "success",
@@ -60,7 +94,7 @@ const EditProfile = () => {
           visibilityTime: 5000,
         });
         console.log("Données mises à jour avec succès");
-        navigation.navigate("Profile");
+        navigation.navigate("BottomTabs");
       } catch (error) {
         console.error("Erreur lors de la mise à jour des données :", error);
         Toast.show({
@@ -73,7 +107,6 @@ const EditProfile = () => {
   };
 
   const loadUserData = async () => {
-    // Vérifie la connexion Internet
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       console.error("Pas de connexion Internet");
@@ -81,15 +114,13 @@ const EditProfile = () => {
     }
 
     const userId = await AsyncStorage.getItem("userId");
-    console.log("ID utilisateur récupéré :", userId);
-
     if (userId) {
       try {
-        const response = await fetch(API_URL.editUserProfile, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const response = await fetch(`${API_URL.editUserProfile}/${userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         if (!response.ok) {
           return;
@@ -99,10 +130,6 @@ const EditProfile = () => {
         setNom(userData.nom || "");
         setEmail(userData.email || "");
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des données :",
-          error.message
-        );
         Toast.show({
           text1: "Erreur",
           text2:
@@ -118,7 +145,7 @@ const EditProfile = () => {
 
   useEffect(() => {
     loadUserData();
-  }, [])
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
