@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
-const bcrytp = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
+const { log } = require("console");
 
 const Register = async (req, res) => {
   try {
@@ -32,7 +33,7 @@ const Register = async (req, res) => {
     }
 
     //hasher le mot de passe des utilisateurs pour la sécurité de comptes
-    const hashedPassword = await bcrytp.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       nom: nom,
@@ -85,12 +86,12 @@ const Login = async (req, res) => {
         .json({ message: "Ce compte n'existe pas. Veuillez vous inscrire" });
     }
 
-    const isPasswordValid = await bcrytp.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email, nom: user.nom }, secretKey, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id, email: user.email, nom: user.nom, lastLogin: user.lastLogin }, secretKey, { expiresIn: '7d' });
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -142,6 +143,7 @@ const UpdateUserProfile = async (req, res) => {
 
     // Inclure updatedAt dans la réponse
     userResponse.updatedAt = user.updatedAt;
+    userResponse.lastLogin = user.lastLogin;
 
     res
       .status(200)
@@ -214,12 +216,54 @@ const DeleteUserAccount = async (req, res) => {
 
 const ChangePassword = async (req, res) => {
   try {
-    
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    // Vérifiez que l'utilisateur est connecté
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: "Accès refusé. Vous devez être connecté." });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    // Vérifiez que les mots de passe sont bien des chaînes de caractères
+    if (typeof oldPassword !== 'string' || typeof newPassword !== 'string' || typeof confirmNewPassword !== 'string') {
+      return res.status(400).json({ message: "Les mots de passe doivent être des chaînes de caractères." });
+    }
+
+    // Vérifiez que les champs de mots de passe sont bien renseignés
+    if (!oldPassword || oldPassword === "") {
+      return res.status(400).json({ message: "L'ancien mot de passe est obligatoire" });
+    }
+    if (!newPassword || newPassword === "") {
+      return res.status(400).json({ message: "Le nouveau mot de passe est obligatoire"});
+    }
+    if (!confirmNewPassword || confirmNewPassword === "") {
+      return res.status(400).json({ message: "La confirmation du nouveau mot de passe est obligatoire"});
+    }
+
+    // Vérifiez que les nouveaux mots de passe correspondent
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: "Les nouveaux mots de passe ne correspondent pas." });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "L'ancien mot de passe est incorrect." });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Mot de passe modifié avec succès." });
   } catch (error) {
-    
+    console.error("Erreur lors de la modification du mot de passe :", error);
+    res.status(500).json({ message: "Erreur lors de la modification du mot de passe." });
   }
 };
-
 
 const protectedData = (req, res) => {
   try {
@@ -245,6 +289,21 @@ const protectedData = (req, res) => {
   }  
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const  userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+    return res.status(200).json(user);
+    
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message: "Erreur de serveur"});
+  }
+};
+
 module.exports = {
   Register,
   Login,
@@ -255,5 +314,6 @@ module.exports = {
   Logout,
   ChangePassword,
   ResetPassword,
-  protectedData
+  protectedData,
+  getUserById
 };

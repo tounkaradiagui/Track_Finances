@@ -11,6 +11,7 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "./../config/index";
 import { useUser } from "../UserContext";
+import Toast from "react-native-toast-message";
 
 const AddBudget = () => {
   const { user } = useUser() || {}; // Vérification du contexte utilisateur
@@ -56,12 +57,18 @@ const AddBudget = () => {
       });
 
       if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || "Erreur lors de la création du Budget");
+        return;
       }
 
       const data = await response.json();
       // console.log(data);
+      Toast.show({
+        type: "success",
+        text1: "Féliciations !!",
+        text2: "Votre budget a été ajouté avec succès !",
+        position: "top",
+        visibilityTime: 5000,
+      });
       setAmount("");
       setDescription("");
       setPeriod("");
@@ -71,19 +78,6 @@ const AddBudget = () => {
       console.error("Erreur lors de la création du budget", error);
     }
   };
-
-  // useEffect(() => {
-  //   const fetchUserId = async () => {
-  //     const id = await AsyncStorage.getItem("userId");
-  //     if (id) {
-  //       setUserId(id);
-  //     } else {
-  //       console.error("User ID manquant dans AsyncStorage");
-  //     }
-  //   };
-
-  //   fetchUserId();
-  // }, []);
 
   useEffect(() => {
     // Récupérer les catégories depuis la base de données

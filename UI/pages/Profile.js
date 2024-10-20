@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Switch,
+  RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,11 +18,23 @@ import { useUser } from "../UserContext";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useTheme } from "../context/ThemeContext";
+import { useCallback, useEffect, useState } from "react";
+import { API_URL } from "../config";
+import Toast from "react-native-toast-message";
 
 const Profile = () => {
   const { user, setUser } = useUser();
   const { darkModeEnabled } = useTheme();
   const navigation = useNavigation();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   if (!user) {
     return <Text>Chargement...</Text>;
@@ -50,181 +63,160 @@ const Profile = () => {
     console.log("Token removed");
     setUser(null);
     navigation.navigate("PublicScreen", { screen: "Login" });
+    Toast.show({
+      type: "success",
+      text1: "Féliciations !!",
+      text2: "Vous êtes deconnecté !",
+      position: "top",
+      visibilityTime: 5000,
+    });
   };
 
+  // const fetchUserInfo = async () => {
+  //   try {
+  //     const storedUserInfo = await AsyncStorage.getItem("userInfo");
+  //     if (storedUserInfo) {
+  //       setUser(JSON.parse(storedUserInfo));
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Erreur lors de la récupération des informations utilisateur :",
+  //       error
+  //     );
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchUserInfo();
+  // }, []);
+
+  if (!user) {
+    return <Text>Chargement...</Text>; // Affichez un message de chargement
+  }
+
   return (
-    <SafeAreaView
+    <ScrollView
       style={[
         styles.container,
         darkModeEnabled ? styles.darkContainer : styles.lightContainer,
       ]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <StatusBar backgroundColor="#078ECB" style="light" />
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.profile}>
-            <TouchableOpacity>
-              <View style={styles.ProfilePicture}>
-                <Image
-                  source={require("../assets/images/profile-picture.jpg")}
-                  style={styles.ProfilePicture}
-                />
-              </View>
-              <View style={styles.FeatherIcon}>
-                <FontAwesome name="camera" size={15} color="white" />
-                {/* <Feather name="edit" size={15} color="white" /> */}
-              </View>
-            </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "column",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                }}
-              >
-                {user.prenom} {user.nom}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  textAlign: "center",
-                }}
-              >
-                {/* tounkaradiagui@gmail.com */}
-                {user.email}
-              </Text>
-
-              <Text
-                // style={{
-                //   fontSize: 15,
-                //   textAlign: "center",
-                // }}
-                style={[
-                  styles.text,
-                  darkModeEnabled ? styles.darkText : styles.lightText,
-                ]}
-              >
-                Dernière connexion : {formatDate(user.lastLogin)}
-              </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.profile}>
+          <TouchableOpacity>
+            <View style={styles.ProfilePicture}>
+              <Image
+                source={require("../assets/images/profile-picture.jpg")}
+                style={styles.ProfilePicture}
+              />
             </View>
-          </View>
-
+            <View style={styles.FeatherIcon}>
+              <FontAwesome name="camera" size={15} color="white" />
+            </View>
+          </TouchableOpacity>
           <View
             style={{
-              paddingHorizontal: 20,
-              borderBottomWidth: 1,
-              borderBottomColor: "#078ECB",
-              marginHorizontal: 20,
-              marginTop: 10,
+              flexDirection: "column",
             }}
           >
-            {/* <Text style={{ fontSize: 18, marginLeft: -20 }}>Préférences</Text> */}
-          </View>
-
-          {/* Thème */}
-          {/* <View style={styles.option}>
-            <Ionicons
-              name="sunny"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>Thème</Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </View> */}
-          {/* <TouchableOpacity style={styles.option} onPress={toggleTheme}>
-            <Ionicons
-              name="sunny"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>
-              Thème {darkModeEnabled ? "sombre" : "clair"}
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              {user.prenom} {user.nom}
             </Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity> */}
+            <Text
+              style={{
+                fontSize: 15,
+                textAlign: "center",
+              }}
+            >
+              {user.email}
+            </Text>
 
-          {/* Notifications */}
-          <TouchableOpacity style={styles.option}>
-            <FontAwesome
-              name="bell"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>Notifications</Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
+            <Text
+              style={[
+                styles.text,
+                darkModeEnabled ? styles.darkText : styles.lightText,
+              ]}
+            >
+              Dernière connexion : {formatDate(user.lastLogin)}
+            </Text>
+          </View>
+        </View>
 
-          {/* Paramètres */}
-          <TouchableOpacity
-            style={styles.option}
-            onPress={() => navigation.navigate("Settings")}
-          >
-            <MaterialIcons
-              name="settings"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>Paramètres</Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            borderBottomWidth: 1,
+            borderBottomColor: "#078ECB",
+            marginHorizontal: 20,
+            marginTop: 10,
+          }}
+        ></View>
 
-          {/* A Propos */}
-          <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("About")}>
-            <MaterialIcons
-              name="help"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>A Propos</Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
+        {/* Notifications */}
+        <TouchableOpacity style={styles.option}>
+          <FontAwesome
+            name="bell"
+            size={24}
+            color="#078ECB"
+            style={styles.icon}
+          />
+          <Text style={styles.optionText}>Notifications</Text>
+          <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+        </TouchableOpacity>
 
-          {/* Déconnexion */}
-          <TouchableOpacity style={styles.option} onPress={handleLogout}>
-            <SimpleLineIcons
-              name="logout"
-              size={24}
-              color="#078ECB"
-              style={styles.icon}
-            />
-            <Text style={styles.optionText}>Déconnexion</Text>
-            <MaterialIcons
-              name="keyboard-arrow-right"
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
-        </ScrollView>
-    </SafeAreaView>
+        {/* Paramètres */}
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate("Settings")}
+        >
+          <MaterialIcons
+            name="settings"
+            size={24}
+            color="#078ECB"
+            style={styles.icon}
+          />
+          <Text style={styles.optionText}>Paramètres</Text>
+          <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+        </TouchableOpacity>
+
+        {/* A Propos */}
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate("About")}
+        >
+          <MaterialIcons
+            name="help"
+            size={24}
+            color="#078ECB"
+            style={styles.icon}
+          />
+          <Text style={styles.optionText}>A Propos</Text>
+          <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+        </TouchableOpacity>
+
+        {/* Déconnexion */}
+        <TouchableOpacity style={styles.option} onPress={handleLogout}>
+          <SimpleLineIcons
+            name="logout"
+            size={24}
+            color="#078ECB"
+            style={styles.icon}
+          />
+          <Text style={styles.optionText}>Déconnexion</Text>
+          <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
+        </TouchableOpacity>
+      </ScrollView>
+    </ScrollView>
   );
 };
 
@@ -233,7 +225,8 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+    marginTop: 30,
   },
   profile: {
     padding: 24,

@@ -13,12 +13,12 @@ const SettingsScreen = () => {
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity>
 
-      {/* <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Notification')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('ChangePassword')}>
         <Text style={styles.optionText}>Changer le mot de passe</Text>
         <AntDesign name="right" size={20} color="#E9B94E" />
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
-      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
+      <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Security')}>
         <Text style={styles.optionText}>Sécurité</Text>
         <AntDesign name="right" size={20} color="#E9B94E" />
       </TouchableOpacity>

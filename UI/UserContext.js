@@ -8,21 +8,25 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const getUserData = async () => {
-            const storedToken = await AsyncStorage.getItem('authToken');
-            const userId = await AsyncStorage.getItem('userId');
-            if (storedToken && userId) {
-                const userData = {
-                    userId: userId,
-                    authToken: storedToken,
-                };
-                setUser(userData);
+            try {
+                const storedToken = await AsyncStorage.getItem('authToken');
+                const userId = await AsyncStorage.getItem('userId');
+                const storedUserInfo = await AsyncStorage.getItem("userInfo");
+    
+                if (storedToken && userId && storedUserInfo) {
+                    const userData = {
+                        userId: userId,
+                        authToken: storedToken,
+                        userInfo: JSON.parse(storedUserInfo)
+                    };
+                    setUser(userData);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération des données utilisateur :", error);
             }
-          
-            console.log('Token:', storedToken);
-            console.log('User ID:', userId);
         };
         getUserData();
-    }, []);
+    }, []);    
 
     return (
         <UserContext.Provider value={{ user, setUser }}>

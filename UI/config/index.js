@@ -1,5 +1,5 @@
-const BASE_URL = 'https://track-finances.onrender.com';
-// const BASE_URL = 'http://192.168.228.140:5000';
+// const BASE_URL = 'https://track-finances.onrender.com';
+const BASE_URL = 'http://192.168.156.140:5000';
 
 export const API_URL = {
     register: `${BASE_URL}/api/auth/register`,
@@ -15,5 +15,9 @@ export const API_URL = {
     getTransactions: `${BASE_URL}/api/auth/transactions`,
     createTransaction: `${BASE_URL}/api/auth/transaction`,
 
-    editUserProfile: `${BASE_URL}/api/auth/user/profile`
+    editUserProfile: `${BASE_URL}/api/auth/user/profile`,
+
+    deleteAccount: `${BASE_URL}/api/auth/user/profile`,
+
+    changePassword: `${BASE_URL}/api/auth/user/profile/change-password`
 };

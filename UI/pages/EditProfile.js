@@ -89,8 +89,7 @@ const EditProfile = () => {
         Toast.show({
           type: "success",
           text1: "Profil mis à jour avec succès",
-          text2:
-            "Vous pouvez maintenant vous connecter avec vos nouvelles infos",
+          text2:"Vous pouvez maintenant vous connecter avec vos nouvelles infos",
           position: "top",
           visibilityTime: 5000,
         });

@@ -1,5 +1,7 @@
 import {
   FlatList,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,11 +13,21 @@ import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../config";
+import { COLORS } from "../constants";
 
 const Transaction = () => {
   const navigation = useNavigation();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000)
+  }, []);
 
   const fetchTransactions = async () => {
     try {
@@ -52,7 +64,7 @@ const Transaction = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       } else {
         const data = await response.json();
         setCategories(data.categories || []);
@@ -75,17 +87,20 @@ const Transaction = () => {
     }, [])
   );
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   const renderTransactionItem = ({ item }) => {
-    // Cherchez la catégorie correspondante
     const category = categories.find((cat) => cat._id === item.categoryId);
     const categoryName = category ? category.name : "Aucune catégorie";
-
     const formattedAmount =
-      item.type === "depense"
+      item.type === "Dépense"
         ? `- ${item.amount} Franc AES`
         : `+ ${item.amount} Franc AES`;
     const amountStyle =
-      item.type === "depense"
+      item.type === "Dépense"
         ? styles.transactionAmountExpense
         : styles.transactionAmount;
 
@@ -94,30 +109,39 @@ const Transaction = () => {
         <Text style={styles.transactionType}>{item.type}</Text>
         <Text style={amountStyle}>{formattedAmount}</Text>
         <Text style={styles.transactionDescription}>{categoryName}</Text>
+        <Text style={styles.transactionDate}>{formatDate(item.createdAt)}</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("TransactionDetails", { transaction: item })}
+          style={styles.detailsButton}
+        >
+          <Text style={styles.detailsButtonText}>Consulter</Text>
+        </TouchableOpacity>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Liste de Transaction</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("AddTransaction")}>
-          <AntDesign name="plussquare" size={30} color="#E9B94E" />
-        </TouchableOpacity>
-      </View>
-      {transactions.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Aucune transaction disponible</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Liste de Transaction</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddTransaction")}>
+            <AntDesign name="plussquare" size={30} color="#E9B94E" />
+          </TouchableOpacity>
         </View>
-      ) : (
-        <FlatList
-          data={transactions}
-          renderItem={renderTransactionItem}
-          keyExtractor={(item) => item._id}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      )}
+        {transactions.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Aucune transaction disponible</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={transactions}
+            renderItem={renderTransactionItem}
+            keyExtractor={(item) => item._id}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+            
+          />
+        )}
     </SafeAreaView>
   );
 };
@@ -152,15 +176,22 @@ const styles = StyleSheet.create({
     color: "#343A40", // Couleur sombre pour le texte
   },
   transactionCard: {
-    backgroundColor: "#FFFFFF", // Fond blanc pour les cartes
+    backgroundColor: "#fff", // Fond blanc pour les cartes
     borderRadius: 10,
+    borderColor:COLORS.primary,
+    borderWidth:2,
     padding: 15,
     marginVertical: 5,
-    shadowColor: "#000", // Ombre
+    shadowColor: "#007BFF", // Ombre
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 3, // Ombre sur Android
+  },
+  transactionDate: {
+    fontSize: 14,
+    color: "#6C757D",
+    marginTop: 5,
   },
   transactionType: {
     fontSize: 18,
@@ -182,6 +213,17 @@ const styles = StyleSheet.create({
   transactionDescription: {
     fontSize: 16,
     color: "#6C757D", // Couleur grise pour la description
+  },
+  detailsButton: {
+    marginTop: 10,
+    backgroundColor: "#E9B94E",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  detailsButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   separator: {
     height: 10, // Espacement entre les cartes

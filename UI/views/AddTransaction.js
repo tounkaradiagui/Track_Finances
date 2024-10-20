@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { API_URL } from "../config";
+import Toast from "react-native-toast-message";
 
 const AddTransaction = () => {
   const navigation = useNavigation();
@@ -29,6 +30,19 @@ const AddTransaction = () => {
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
+  
+      const numericAmount = Number(amount);
+      if (numericAmount <= 0) {
+        Toast.show({
+          text1: "Erreur",
+          text2: "Le montant doit être supérieur à zéro.",
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+        return;
+      }
+  
       const response = await fetch(API_URL.createTransaction, {
         method: "POST",
         headers: {
@@ -37,34 +51,47 @@ const AddTransaction = () => {
         },
         body: JSON.stringify({
           type: type,
-          amount: amount,
+          amount: numericAmount,
           categoryId: categoryId,
           budgetId: budgetId,
           description: description,
         }),
       });
-
+  
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Erreur lors de la création de la catégorie"
-        );
+        return;
       }
-
+  
       setType("");
       setAmount("");
       setCategoryId("");
       setBudgetId("");
       setDescription("");
+      
+      // Rafraîchir les budgets
+      await fetchBudgets(); 
+
       navigation.navigate("Transaction");
-      Alert.alert("Succès", "Transaction ajoutée avec succès !");
+      Toast.show({
+        type: "success",
+        text1: "Féliciations !!",
+        text2: "Transaction ajoutée avec succès !",
+        position: "top",
+        visibilityTime: 5000,
+      });
     } catch (error) {
-      console.error(error);
-      Alert.alert("Erreur", error.message);
+      Toast.show({
+        text1: "Erreur",
+        text2: error.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     } finally {
       setLoading(false);
     }
   };
+  
 
   const fetchCategories = async () => {
     try {
@@ -77,13 +104,12 @@ const AddTransaction = () => {
         },
       });
       if (!response.ok) {
-        throw new Error(
-          response.statusText || "Erreur lors de la récupération des catégories"
-        );
+        return;
       }
 
       const data = await response.json();
-      setCategories(data.categories); // Stocker les données dans l'état
+      setCategories(data.categories); 
+      // Stocker les données dans l'état
       // console.log("Catégories récupérées:", data);
     } catch (error) {
       console.error("Erreur lors de la récupération des catégories:", error);
@@ -92,25 +118,27 @@ const AddTransaction = () => {
 
   const fetchBudgets = async () => {
     try {
-      await AsyncStorage.getItem("authToken");
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("Token d'authentification manquant");
+      }
       const response = await fetch(API_URL.getBudget, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
-        throw new Error(
-          response.statusText || "Erreur lors de la récupération des budgets"
-        );
+        return;
       }
+  
       const data = await response.json();
-
+      // console.log("Budgets récupérés:", data.budget); // Log pour débogage
       setBudgets(data.budget || []);
-      // console.log("Budgets récupérés:", data);
     } catch (err) {
-      console.error("Erreur lors de la récupération des budgets:", err);
+      // console.error("Erreur lors de la récupération des budgets:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -140,8 +168,8 @@ const AddTransaction = () => {
           onValueChange={(itemValue) => setType(itemValue)}
           style={{ height: 50 }}
         >
-          <Picker.Item label="Dépense" value="depense" />
-          <Picker.Item label="Revenu" value="revenu" />
+          <Picker.Item label="Dépense" value="Dépense" />
+          <Picker.Item label="Revenu" value="Revenu" />
         </Picker>
       </View>
       <TextInput
@@ -182,7 +210,7 @@ const AddTransaction = () => {
       >
         <Picker
           selectedValue={budgetId}
-          onValueChange={(itemValue) => setBudgetId(itemValue)} // Assurez-vous que setBudgetId est défini
+          onValueChange={(itemValue) => setBudgetId(itemValue)}
           style={{ height: 50 }}
         >
           <Picker.Item label="Sélectionner un budget" value="" />
@@ -194,17 +222,6 @@ const AddTransaction = () => {
                 value={budget._id}
               />
             ))}
-          {/* {budgets.map(
-            (
-              budgets // Assurez-vous que 'budgets' est un tableau d'objets budget
-            ) => (
-              <Picker.Item
-                key={budgets._id}
-                label={`${budgets.description} - ${budgets.amount} Franc AES`} // Adaptez selon vos besoins
-                value={budgets._id}
-              />
-            )
-          )} */}
         </Picker>
       </View>
       <View

@@ -24,12 +24,9 @@ const Budget = () => {
   const fetchBudgets = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
-      // console.log("Token récupéré:", token); // Ajoutez ce log
-
       if (!token) {
         throw new Error("Token d'authentification manquant");
       }
-      // const token = await AsyncStorage.getItem('authToken');
       const response = await fetch(API_URL.getBudget, {
         method: "GET",
         headers: {
@@ -37,18 +34,14 @@ const Budget = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
-        return;
+        throw new Error("Erreur lors de la récupération des budgets");
       }
-
-      // Trier les budgets par montant de façon décroissante
-      // const sortedBudgets = data.budget ? data.budget.sort((a, b) => b.amount - a.amount) : [];
-      // setBudget(sortedBudgets);
-
+  
       const data = await response.json();
-      // console.log("Budgets récupérés:", data.budget); // Log pour débogage
-      setBudget(data.budget || []); // Adaptez selon votre structure de données
+      console.log("Budgets récupérés:", data.budget); // Log pour débogage
+      setBudget(data.budget || []);
     } catch (err) {
       console.error("Erreur lors de la récupération des budgets:", err);
       setError(err.message);
@@ -69,7 +62,7 @@ const Budget = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des catégories");
+        return;
       }
 
       const data = await response.json();
@@ -92,12 +85,13 @@ const Budget = () => {
   );
 
   const renderBudgetItem = ({ item }) => {
-    // console.log("Item budget:", item); // Vérifiez les données de l'item
-
     // Cherchez la catégorie correspondante
     const category = categories.find((cat) => cat._id === item.categoryId);
     const categoryName = category ? category.name : "Aucune catégorie";
-
+  
+    // Assurez-vous que l'amount est un nombre
+    const amount = Number(item.amount) || 0; // Convertir en nombre ou 0 si NaN
+  
     return (
       <View style={styles.card}>
         <View style={styles.iconContainer}>
@@ -106,9 +100,7 @@ const Budget = () => {
         <View style={styles.details}>
           <Text style={styles.itemName}>{categoryName}</Text>
           <Text style={styles.itemCategory}>
-            {item.amount
-              ? `${item.amount} Franc AES`
-              : "Montant non disponible"}
+            {amount > 0 ? `${amount} Franc AES` : "Montant non disponible"}
           </Text>
         </View>
       </View>

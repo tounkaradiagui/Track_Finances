@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import BottomTabs from '../navigation/BottomTabs'; // Assurez-vous que ce chemin est correct
+import BottomTabs from '../navigation/BottomTabs';
 import Home from '../screen/Home';
 import Transaction from '../pages/Transaction';
 import Categories from '../pages/Categories';
@@ -13,6 +13,9 @@ import AddBudget from '../views/AddBudget';
 import Settings from '../pages/Settings';
 import About from '../pages/About';
 import EditProfile from '../pages/EditProfile';
+import Security from '../pages/Security';
+import ChangePassword from './ChangePassword';
+import TransactionDetails from '../views/TransactionDetails';
 
 const ProtectedData = () => {
     const Stack = createNativeStackNavigator();
@@ -24,8 +27,10 @@ const ProtectedData = () => {
             <Stack.Screen name="Categories" component={Categories} options={{ headerShown: false }} />
             <Stack.Screen name="Budget" component={Budget} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-            <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Profil' }} />
+            <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: 'Mon Compte' }} />
+            <Stack.Screen name="Security" component={Security} options={{ title: 'Mon Compte' }} />
             <Stack.Screen name="Settings" component={Settings} options={{ title: 'Paramètre'}}/>
+            <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ title: 'Mon Compte'}}/>
             <Stack.Screen name="About" component={About} options={{ title: 'A Propos'}}/>
 
             {/* Manage categories */}
@@ -33,6 +38,7 @@ const ProtectedData = () => {
 
             {/* Manage transactions */}
             <Stack.Screen name="AddTransaction" component={AddTransaction} options={{ title: 'Transaction'}}/>
+            <Stack.Screen name="TransactionDetails" component={TransactionDetails} options={{ title: 'Détails Transaction'}}/>
 
             {/* Manage budgets */}
             <Stack.Screen name="AddBudget" component={AddBudget} options={{ title: 'Ajouter un Budget'}}/>

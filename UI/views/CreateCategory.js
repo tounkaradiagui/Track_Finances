@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from './../config/index';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const CreateCategory = () => {
   const navigation = useNavigation();
@@ -26,17 +27,28 @@ const CreateCategory = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erreur lors de la création de la catégorie");
+        return;
       }
 
       setName('');
       setDescription('');
       navigation.navigate("Categories");
-      Alert.alert("Succès", "Catégorie créée avec succès !");
+      Toast.show({
+        type: "success",
+        text1: "Féliciations !!",
+        text2: "Catégorie créée avec succès !",
+        position: "top",
+        visibilityTime: 5000,
+      });
     } catch (error) {
-      console.error(error);
-      Alert.alert("Erreur", error.message);
+      // console.error(error);
+      Toast.show({
+        text1: "Erreur",
+        text2: error.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
   };
 

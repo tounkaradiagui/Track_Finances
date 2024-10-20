@@ -1,36 +1,6 @@
 const Transaction = require('../models/Transaction')
 const Budget = require('../models/Budget');
 
-
-// const createTransaction = async (req, res) => {
-//     try {
-//         const { type, amount, description } = req.body; // Récupérer les données de la requête
-
-//         // Vérifier que l'utilisateur est connecté
-//         if (!req.user || !req.user.userId) {
-//             return res.status(401).json({ message: "Accès refusé. Vous devez être connecté." });
-//         }
-
-//         // Créer une nouvelle transaction
-//         const newTransaction = new Transaction({
-//             userId: req.user.userId, // Associer la transaction à l'utilisateur connecté
-//             type,
-//             amount,
-//             description,
-//         });
-
-//         // Enregistrer la nouvelle transaction
-//         await newTransaction.save();
-
-//         res.status(201).json({ message: "Transaction ajoutée avec succès", transaction: newTransaction });
-//     } catch (error) {
-//         console.log("Erreur : ", error);
-//         res.status(500).json({ message: "Erreur lors de l'ajout de la transaction." });
-//     }
-// };
-
-
-
 const createTransaction = async (req, res) => {
     try {
         const { type, amount, description, categoryId, budgetId } = req.body;
@@ -54,36 +24,41 @@ const createTransaction = async (req, res) => {
             return res.status(400).json({ message: "Veuillez choisir un budget." });
         }
 
-        // Vérifier si la transaction est une dépense
-        if (type === 'depense') {
-            const budget = await Budget.findById(budgetId);
-            if (!budget) {
-                return res.status(404).json({ message: "Budget non trouvé." });
-            }
-            if (budget.amount < amount) {
+        // Vérifier le budget
+        const budget = await Budget.findById(budgetId);
+        if (!budget) {
+            return res.status(404).json({ message: "Budget non trouvé." });
+        }
+
+        // Convertir le montant en nombre
+        const numericAmount = Number(amount);
+        if (isNaN(numericAmount)) {
+            return res.status(400).json({ message: "Le montant doit être un nombre valide." });
+        }
+
+        // Traiter les dépenses
+        if (type === 'Dépense') {
+            if (budget.amount < numericAmount) {
                 return res.status(400).json({ message: "Le montant de la dépense dépasse le budget disponible." });
             }
-
-            // Mettre à jour le montant du budget
-            budget.amount -= amount;
-            await budget.save();
+            budget.amount -= numericAmount;
         } 
-        // Vérifier si la transaction est un revenu
-        if (type === 'revenu') {
-            const budget = await Budget.findById(budgetId);
-            if (!budget) {
-                return res.status(404).json({ message: "Budget non trouvé." });
-            }
-            // Mettre à jour le montant du budget
-            budget.amount += amount;
-            await budget.save();
-        }        
+        
+        // Traiter les revenus
+        else if (type === 'Revenu') {
+            budget.amount += numericAmount; // Addition numérique
+        } else {
+            return res.status(400).json({ message: "Type de transaction inconnu." });
+        }
 
-        // Créer une nouvelle transaction
+        // Enregistrement des modifications du budget
+        await budget.save();
+
+        // Création d'une nouvelle transaction
         const newTransaction = new Transaction({
             userId: req.user.userId,
             type,
-            amount,
+            amount: numericAmount, // Enregistre le montant comme un nombre
             description,
             categoryId,
             budgetId,
@@ -94,11 +69,10 @@ const createTransaction = async (req, res) => {
 
         res.status(201).json({ message: "Transaction ajoutée avec succès", transaction: newTransaction });
     } catch (error) {
-        console.log("Erreur : ", error);
+        console.error("Erreur : ", error);
         res.status(500).json({ message: "Erreur lors de l'ajout de la transaction." });
     }
 };
-
 
 
 const getTransactions = async (req, res) => {
