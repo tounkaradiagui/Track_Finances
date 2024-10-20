@@ -21,6 +21,7 @@ const EditProfile = () => {
   }
 
   const navigation = useNavigation();
+
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
@@ -39,15 +40,12 @@ const EditProfile = () => {
       });
       return;
     }
-
     const userData = {
       id: userId,
       prenom: prenom,
       nom: nom,
       email: email,
     };
-
-    console.log("Données utilisateur à mettre à jour :", userData);
 
     if (userId) {
       try {
@@ -59,44 +57,48 @@ const EditProfile = () => {
           body: JSON.stringify(userData),
         });
 
-        // const responseText = await response.text(); // Récupère la réponse sous forme de texte
-        // console.log("Réponse de l'API :", responseText); // Affiche la réponse
-        
-        // Essayez de parser la réponse JSON
-        const data = await response.json();
-        console.log(data);
-
         if (!response.ok) {
+          const errorData = await response.json();
+          // console.error("Erreur lors de la mise à jour :", errorData);
           Toast.show({
             type: "error",
             text1: "Erreur",
-            text2: "Veuillez réessayer plus tard",
+            text2: errorData.message || "Veuillez réessayer plus tard",
             position: "top",
             visibilityTime: 3000,
           });
           return;
         }
 
-        // Mettez à jour le contexte avec les nouvelles informations de l'utilisateur
+        const updatedUserData = await response.json();
+        // console.log("Données mises à jour :", updatedUserData);
+
+        // Mettez à jour le contexte et les états locaux
         setUser((prev) => ({
           ...prev,
-          prenom: data.user.prenom,
-          nom: data.user.nom,
-          email: data.user.email,
+          prenom: updatedUserData.user.prenom || prev.prenom,
+          nom: updatedUserData.user.nom || prev.nom,
+          email: updatedUserData.user.email || prev.email,
         }));
+
+        // Mettre à jour les états locaux
+        setPrenom(updatedUserData.user.prenom || "");
+        setNom(updatedUserData.user.nom || "");
+        setEmail(updatedUserData.user.email || "");
 
         Toast.show({
           type: "success",
           text1: "Profil mis à jour avec succès",
           text2:
-            "Vous pouvez maintenant vous connecter avec vos nouvelles informations",
+            "Vous pouvez maintenant vous connecter avec vos nouvelles infos",
           position: "top",
           visibilityTime: 5000,
         });
-        console.log("Données mises à jour avec succès");
-        navigation.navigate("BottomTabs");
+
+        await loadUserData(); // Assurez-vous que cela appelle la bonne URL
+        navigation.navigate("Profile");
       } catch (error) {
-        console.error("Erreur lors de la mise à jour des données :", error);
+        // console.error("Erreur lors de la mise à jour des données :", error);
         Toast.show({
           text1: "Erreur",
           text2: "Échec de la mise à jour. Veuillez réessayer.",
@@ -107,45 +109,52 @@ const EditProfile = () => {
   };
 
   const loadUserData = async () => {
-    const state = await NetInfo.fetch();
-    if (!state.isConnected) {
-      console.error("Pas de connexion Internet");
-      return;
-    }
-
-    const userId = await AsyncStorage.getItem("userId");
-    if (userId) {
-      try {
-        const response = await fetch(`${API_URL.editUserProfile}/${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          return;
-        }
-        const userData = await response.json();
-        setPrenom(userData.prenom || "");
-        setNom(userData.nom || "");
-        setEmail(userData.email || "");
-      } catch (error) {
-        Toast.show({
-          text1: "Erreur",
-          text2:
-            error.message ||
-            "Échec de la récupération des données. Veuillez réessayer.",
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("ID utilisateur introuvable.");
       }
+
+      const url = `${API_URL.editUserProfile}/${userId}`;
+      // URL de la requête
+      // console.log("Requête vers l'URL :", url);
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const responseText = await response.text();
+
+      if (!response.ok) {
+        return;
+      }
+
+      const userData = JSON.parse(responseText); // Parsez la réponse en JSON
+      setPrenom(userData.prenom || "");
+      setNom(userData.nom || "");
+      setEmail(userData.email || "");
+    } catch (error) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Échec de la récupération des données. Veuillez réessayer.",
+        type: "error",
+      });
     }
   };
 
   useEffect(() => {
-    loadUserData();
-  }, []);
+    if (user) {
+      setPrenom(user.prenom);
+      setNom(user.nom);
+      setEmail(user.email);
+    } else {
+      // Charge les données si l'utilisateur n'est pas déjà présent
+      loadUserData();
+    }
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.container}>
