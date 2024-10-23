@@ -209,7 +209,13 @@ const Register = () => {
       setPassword("");
       setConfirmPassword("");
       navigation.navigate("Login");
-      Alert.alert("Inscription réussie", "Bienvenue !");
+      Toast.show({
+        type: "success",
+        text1: "Féliciations !!",
+        text2: `Votre Inscription a réussie. Veuillez-vous connecté !!`,
+        position: "top",
+        visibilityTime: 5000,
+      });
     } catch (error) {
       console.log(error);
     }

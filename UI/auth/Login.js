@@ -171,7 +171,13 @@ const Login = () => {
 
         // Naviguer vers l'écran principal
         navigation.navigate("ProtectedData");
-        Alert.alert("Connexion réussie", "Bienvenue !");
+        Toast.show({
+          type: "success",
+          text1: "Féliciations !!",
+          text2: `Vous êtes connecté en tant que ${data.user.prenom} ${data.user.nom}`,
+          position: "top",
+          visibilityTime: 5000,
+        });
     } catch (error) {
         console.error(error);
     } finally {

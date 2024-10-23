@@ -72,23 +72,24 @@ const Profile = () => {
     });
   };
 
-  // const fetchUserInfo = async () => {
-  //   try {
-  //     const storedUserInfo = await AsyncStorage.getItem("userInfo");
-  //     if (storedUserInfo) {
-  //       setUser(JSON.parse(storedUserInfo));
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Erreur lors de la récupération des informations utilisateur :",
-  //       error
-  //     );
-  //   }
-  // };
+  const fetchUserInfo = async () => {
+    try {
+      const storedUserInfo = await AsyncStorage.getItem("userInfo");
+      if (storedUserInfo) {
+        setUser(JSON.parse(storedUserInfo));
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des informations utilisateur :",
+        error
+      );
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchUserInfo();
-  // }, []);
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+  
 
   if (!user) {
     return <Text>Chargement...</Text>; // Affichez un message de chargement

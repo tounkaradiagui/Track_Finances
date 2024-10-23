@@ -80,7 +80,7 @@ const Categories = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Liste des Catégories</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("AddCategory")}>
+        <TouchableOpacity onPress={() => navigation.navigate("CreateCategory")}>
           <AntDesign name="plussquare" size={30} color={"#E9B94E"} />
         </TouchableOpacity>
       </View>

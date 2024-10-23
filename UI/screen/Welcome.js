@@ -1,162 +1,304 @@
 import {
-  View,
-  Text,
   StyleSheet,
-  Image,
+  Text,
+  View,
   TouchableOpacity,
-  Dimensions,
+  ScrollView,
 } from "react-native";
-import React, { useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import IMAGES from "./../assets/index";
 import { StatusBar } from "expo-status-bar";
-import Carousel, { Pagination } from "react-native-snap-carousel";
-// import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Ajoutez cette ligne
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-// import { Ionicons } from '@expo/vector-icons'; // Ajoutez cette ligne
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useContext, useEffect, useState } from "react";
+import { UserType } from "../context/userContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
+import { useUser } from "../UserContext";
 
-const Welcome = () => {
+const Home = () => {
   const navigation = useNavigation();
-  const _carousel = useRef();
-  const [activeDotIndex, setActiveDotIndex] = useState(0);
+  const {user, setUser} = useUser();
 
-  const data = [
-    {
-      id: 2,
-      title: "Le solde de votre compte",
-      description:
-        "Gardez une vue d'ensemble de vos finances en un coup d'oeil. Suivez et gérer facilement le solde de votre compte personnel et restez informé de vos disponibilités financières en temps réel.",
-      image: IMAGES.BALANCE,
-    },
-    {
-      id: 3,
-      title: "Mes recettes",
-      description:
-        "Suivez vos sources de revenus et maximisez vos gains grâce à notre application. Identifiez et catégorisez vos différentes sources de revenus et obtenez une vision claire de vos rentrées d'argent.",
-      image: IMAGES.CHECKING,
-    },
-    {
-      id: 2,
-      title: "Mes dépenses",
-      description:
-        "Contrôlez vos dépenses et améliorer votre gestion financière. Enregistrez et classez facilement vos dépenses dans différentes catégories et visualisez vos habitudes de dépenses pour mieux comprendre où va votre argent.",
-      image: IMAGES.LOADING,
-    },
-    {
-      id: 1,
-      title: "Mon budget",
-      description:
-        "Créez et suivez votre budget personnel pour atteindre vos objectifs financiers. Notre application vous permet de définir des limites budgétaires, de suivre vos dépenses par rapport à celles-ci et de recevoir des alertes pour vous aider à rester sur la bonne voie",
-      image: IMAGES.BANKING,
-    },
-  ];
-
-  const _renderItem = ({ item, index }) => {
-    // Déclarez ici avec const
-    return (
-      <View style={styles.slide}>
-        <Image
-          source={item.image}
-          style={{
-            height: Dimensions.get("window").width,
-            width: Dimensions.get("window").width,
-          }}
-        />
-        <View style={{ padding: 15 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.title}</Text>
-          <Text style={{ fontSize: 15, marginTop: 10 }}>
-            {item.description}
-          </Text>
-        </View>
-      </View>
-    );
+  const fetchUserInfo = async () => {
+    try {
+      const storedUserInfo = await AsyncStorage.getItem("userInfo");
+      if (storedUserInfo) {
+        setUser(JSON.parse(storedUserInfo));
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des informations utilisateur :",
+        error
+      );
+    }
   };
 
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
       <StatusBar backgroundColor="#078ECB" style="light" />
-      <View style={{ alignItems: "flex-end", marginTop: 40, marginEnd: 10 }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Login");
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View>
+          <View style={styles.headerTop}>
+            <Text style={styles.salutation}>Bonjour</Text>
+          </View>
+
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.name}>{user.prenom} {user.nom}</Text>
+            </View>
+            <View>
+              <TouchableOpacity>
+                <Ionicons name="notifications" size={24} color="#078ECB" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 10,
+            marginTop: 10,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
           }}
         >
-          <Text style={{ fontSize: 15, fontWeight: "bold", color: "#078ECB" }}>
-            Sauter
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <Carousel
-        data={data}
-        renderItem={_renderItem}
-        sliderWidth={Dimensions.get("window").width}
-        itemWidth={Dimensions.get("window").width}
-        ref={_carousel}
-        onSnapToItem={(index) => setActiveDotIndex(index)} // Corrigez ici
-        autoplay
-        autoplayInterval={3000}
-        loop
-      />
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Pagination
-          activeDotIndex={activeDotIndex}
-          dotsLength={data.length} // Modifiez ici pour correspondre à la longueur des données
-          carouselRef={_carousel}
-          dotStyle={{
-            backgroundColor: "#078ECB",
-            width: 15,
-          }}
-          inactiveDotStyle={{
-            width: 10,
-            height: 10,
-            backgroundColor: "#E9B94E",
-          }}
-        />
-        <View style={{ padding: 15, flexDirection: "row" }}>
           <TouchableOpacity
-            onPress={() => _carousel.current.snapToItem(activeDotIndex - 1)}
+            style={{
+              padding: 28,
+              backgroundColor: "#078ECB",
+              borderTopLeftRadius: 20,
+              borderBottomLeftRadius: 20,
+            }}
           >
-            <View
+            <View style={{ flexDirection: "row" }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#fff" }}>
+                Revenu
+              </Text>
+              <MaterialIcons
+                name="account-balance-wallet"
+                size={30}
+                color="white"
+                style={{ marginLeft: 15 }}
+              />
+            </View>
+            <Text
               style={{
-                height: 40,
-                width: 40,
-                borderRadius: 25,
-                backgroundColor: "#E9B94E",
-                marginEnd: 10,
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#fff",
+                marginTop: 5,
               }}
             >
-              <FontAwesome name="arrow-left" size={18} color="white" />
-            </View>
+              25000 F CFA
+            </Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            onPress={() => _carousel.current.snapToItem(activeDotIndex + 1)}
+            style={{
+              padding: 30,
+              backgroundColor: "#078ECB",
+              borderBottomLeftRadius: 20,
+              paddingHorizontal: 20,
+              borderTopRightRadius: 20,
+            }}
           >
-            <View
+            <View style={{ flexDirection: "row" }}>
+              <Text
+                style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
+              >
+                Dépenses
+              </Text>
+              <FontAwesome5
+                name="money-check-alt"
+                size={24}
+                color="white"
+                style={{ marginLeft: 15 }}
+              />
+            </View>
+            <Text
               style={{
-                height: 40,
-                width: 40,
-                borderRadius: 25,
-                backgroundColor: "#078ECB",
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#fff",
+                marginTop: 5,
               }}
             >
-              <FontAwesome name="arrow-right" size={18} color="white" />
-            </View>
+              34000 F CFA
+            </Text>
           </TouchableOpacity>
         </View>
-      </View>
+        <View>
+          <View
+            style={{
+              marginTop: 20,
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#E9B94E",
+              marginHorizontal: 15,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          >
+            <View>
+              <Text style={styles.name}>Transactions</Text>
+            </View>
+            <View>
+              <TouchableOpacity
+                style={{ flexDirection: "row" }}
+                onPress={() => navigation.navigate("Transaction")}
+              >
+                <Text
+                  style={{ fontSize: 18, fontWeight: "bold", color: "black" }}
+                >
+                  All
+                </Text>
+                <MaterialIcons
+                  name="keyboard-arrow-right"
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#078ECB",
+              marginHorizontal: 15,
+              // borderBottomLeftRadius: 20,
+              // borderBottomRightRadius: 20,
+            }}
+          >
+            <View>
+              <View style={{ flexDirection: "row" }}>
+                <Entypo name="shopping-cart" size={24} color="white" />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Achats
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", marginTop: 5 }}>
+                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date</Text> */}
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Vendredi 18/10/2023 15:20 min
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
+            >
+              {" "}
+              - 30.000 F CFA{" "}
+            </Text>
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#078ECB",
+              marginHorizontal: 15,
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+            }}
+          >
+            <View>
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome name="wifi" size={24} color="white" />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Abonnement
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", marginTop: 5 }}>
+                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date : </Text> */}
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Lundi 12/10/2023 09:30 min
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
+            >
+              {" "}
+              - 200.000 F CFA{" "}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default Welcome;
+export default Home;
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#fff",
-    justifyContent: "space-between",
+  headerTop: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    paddingHorizontal: 10,
   },
-  slide: {},
+
+  header: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+  },
+
+  salutation: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  name: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
 });

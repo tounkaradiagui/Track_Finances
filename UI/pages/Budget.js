@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { API_URL } from "../config";
@@ -16,7 +16,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Budget = () => {
   const [budget, setBudget] = useState([]);
   const [categories, setCategories] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [error, setError] = useState(null);
@@ -34,13 +33,12 @@ const Budget = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des budgets");
+        return;;
       }
-  
+
       const data = await response.json();
-      console.log("Budgets récupérés:", data.budget); // Log pour débogage
       setBudget(data.budget || []);
     } catch (err) {
       console.error("Erreur lors de la récupération des budgets:", err);
@@ -68,7 +66,7 @@ const Budget = () => {
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (err) {
-      console.error("Erreur lors de la récupération des catégories:", err);
+      console.log("Erreur lors de la récupération des catégories:", err);
     }
   };
 
@@ -85,13 +83,10 @@ const Budget = () => {
   );
 
   const renderBudgetItem = ({ item }) => {
-    // Cherchez la catégorie correspondante
     const category = categories.find((cat) => cat._id === item.categoryId);
     const categoryName = category ? category.name : "Aucune catégorie";
-  
-    // Assurez-vous que l'amount est un nombre
-    const amount = Number(item.amount) || 0; // Convertir en nombre ou 0 si NaN
-  
+    const amount = Number(item.amount) || 0;
+
     return (
       <View style={styles.card}>
         <View style={styles.iconContainer}>
@@ -100,7 +95,7 @@ const Budget = () => {
         <View style={styles.details}>
           <Text style={styles.itemName}>{categoryName}</Text>
           <Text style={styles.itemCategory}>
-            {amount > 0 ? `${amount} Franc AES` : "Montant non disponible"}
+            {amount > 0 ? `${amount} Franc AES` : "0 Franc AES"}
           </Text>
         </View>
       </View>
@@ -115,7 +110,11 @@ const Budget = () => {
           <AntDesign name="plussquare" size={30} color="#E9B94E" />
         </TouchableOpacity>
       </View>
-      {budget.length === 0 ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Chargement...</Text>
+        </View>
+      ) : budget.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Aucun budget disponible</Text>
         </View>
@@ -144,7 +143,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
-    marginHorizontal: 15,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
   },
   emptyContainer: {
     flex: 1,
@@ -157,24 +164,23 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
+    color: "#343A40",
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4a90e2",
+    backgroundColor: "#fff",
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#E9B94E",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   iconContainer: {
     backgroundColor: "#3f669d",
@@ -187,29 +193,14 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 18,
-    color: "#fff",
-  },
-  itemAmount: {
-    fontSize: 16,
-    color: "#fff",
-  },
-  separator: {
-    height: 10,
+    color: "#343A40",
   },
   itemCategory: {
     fontSize: 14,
-    color: "#E9B94E", // Une couleur qui se démarque
-    fontWeight: "600", // Poids de police légèrement plus épais
-    marginTop: 4, // Un peu d'espace au-dessus
-    marginBottom: 4, // Un peu d'espace en-dessous
-    textTransform: "capitalize", // Met en majuscule la première lettre de chaque mot
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 1, // Pour Android
+    color: "#6C757D",
+    marginTop: 4,
+  },
+  separator: {
+    height: 10,
   },
 });

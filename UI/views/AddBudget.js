@@ -92,10 +92,7 @@ const AddBudget = () => {
           },
         });
         if (!response.ok) {
-          throw new Error(
-            response.statusText ||
-              "Erreur lors de la récupération des catégories"
-          );
+          return;
         }
 
         const data = await response.json();

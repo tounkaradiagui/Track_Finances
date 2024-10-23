@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {Register, Login, UpdateUserProfile, DeleteUserAccount, ForgotPassword, Logout, ChangePassword, ResetPassword, protectedData, getUserById} = require('../controllers/userController');
+const {Register, Login, UpdateUserProfile, DeleteUserAccount, Logout, ChangePassword, ResetPassword, protectedData, getUserById, requestPasswordReset,} = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Définition d'une route de base faculttatif qui renvoie un message pour tester le serveur
@@ -14,8 +14,8 @@ router.post('/logout', Logout);
 router.patch('/user/profile/:userId', authMiddleware, UpdateUserProfile);
 // router.get('/user/:userId',authMiddleware, adminMiddleware, getUserById);
 router.delete('/user/profile/:userId', authMiddleware, DeleteUserAccount);
-router.post('/user/forgot-password/:token', authMiddleware, ForgotPassword);
-router.post('/user/reset-password/:token', authMiddleware, ResetPassword);
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', ResetPassword);
 router.post('/user/profile/change-password', authMiddleware, ChangePassword);
 router.get('/protected', authMiddleware, protectedData);
 
