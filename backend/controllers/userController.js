@@ -521,7 +521,7 @@ const requestPasswordReset = async (req, res) => {
             </div>
             <div class="body">
                 <p>Vous avez demandé la réinitialisation de votre mot de passe. Veuillez suivre ce lien pour réinitialiser votre mot de passe : 
-                <a href="http://${req.headers.host}/api/auth/reset-password/${token}">Réinitialiser le mot de passe</a></p>
+                <a href="http://192.168.200.140:5000/api/auth/reset-password/${token}">Réinitialiser le mot de passe</a></p>
                 <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet e-mail.</p>
             </div>
             <div class="footer">

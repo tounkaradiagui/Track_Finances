@@ -8,58 +8,49 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { API_URL } from "../config"; // Assure-toi que cela correspond à ta configuration
+import { API_URL } from "../config"; // Assurez-vous que cela correspond à votre configuration
 import Toast from "react-native-toast-message";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
+const ResetPassword = () => {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
+  
+  const handleResetPassword = async () => {
+      const { token } = route.params; // Récupérer le token passé en paramètre
+    if (!newPassword || !confirmPassword) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez remplir tous les champs.",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      return;
+    }
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour valider l'email
-    return emailRegex.test(email);
-  };
-
-  const handleRequestReset = async () => {
-    if (!email) {
-      // Vérifier si le champ est rempli
-      if (!email) {
-        Toast.show({
-          text1: "Erreur",
-          text2: "Veuillez entrer votre email.",
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
-
-        setLoading(false);
-        return;
-      }
-
-      // Validation de l'email
-      if (!isValidEmail(email)) {
-        Toast.show({
-          text1: "Erreur",
-          text2: "Veuillez entrer un email valide.",
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
-        setLoading(false);
-        return;
-      }
+    if (newPassword !== confirmPassword) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Les mots de passe ne correspondent pas.",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL.requestReset}`, {
+      const response = await fetch(`${API_URL.resetPassword}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ token, newPassword, confirmPassword }),
       });
 
       if (!response.ok) {
@@ -71,18 +62,18 @@ const ForgotPassword = () => {
           position: "top",
           visibilityTime: 3000,
         });
-        setLoading(false);
         return;
       }
+
       Toast.show({
         type: "success",
-        text1: "Féliciations !!",
-        text2: `Un lien de réinitialisation a été envoyé à votre e-mail`,
+        text1: "Succès",
+        text2: "Votre mot de passe a été réinitialisé avec succès.",
         position: "top",
         visibilityTime: 5000,
       });
-      navigation.navigate("ResetPassword");
-      // navigation.navigate("ResetPassword", { token: yourToken });
+
+      navigation.navigate("Login"); // Rediriger vers la page de connexion après succès
     } catch (error) {
       Toast.show({
         text1: "Erreur",
@@ -101,25 +92,32 @@ const ForgotPassword = () => {
       <Text style={styles.title}>Réinitialiser votre mot de passe</Text>
       <TextInput
         style={styles.input}
-        placeholder="Adresse e-mail"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        placeholder="Nouveau mot de passe"
+        value={newPassword}
+        onChangeText={setNewPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmer le mot de passe"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={handleRequestReset}
+        onPress={() => navigation.navigate("Login")}
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? "Envoi..." : "Envoyer le lien de réinitialisation"}
+          {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
         </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
-export default ForgotPassword;
+export default ResetPassword;
 
 const styles = StyleSheet.create({
   container: {

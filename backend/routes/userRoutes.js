@@ -15,7 +15,7 @@ router.patch('/user/profile/:userId', authMiddleware, UpdateUserProfile);
 // router.get('/user/:userId',authMiddleware, adminMiddleware, getUserById);
 router.delete('/user/profile/:userId', authMiddleware, DeleteUserAccount);
 router.post('/request-password-reset', requestPasswordReset);
-router.post('/reset-password', ResetPassword);
+router.post('/reset-password/:token', ResetPassword);
 router.post('/user/profile/change-password', authMiddleware, ChangePassword);
 router.get('/protected', authMiddleware, protectedData);
 

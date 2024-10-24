@@ -232,7 +232,7 @@ const Login = () => {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="Adresse Email"
+                  placeholder="Adresse email"
                   style={{
                     borderColor: "#078ECB",
                     color: "black",
