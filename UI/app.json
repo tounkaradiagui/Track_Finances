@@ -1,33 +1,12 @@
 {
   "expo": {
-    "name": "FunsWise",
-    "slug": "FunsWise",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/banking.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/images/balance.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/loading.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.diaguitounkara.fundwise"
-    },
-    "web": {
-      "favicon": "./assets/images/welcome/Revenue-bro.png"
-    },
     "extra": {
       "eas": {
         "projectId": "48042aec-3ff2-469d-ac85-2ad808df9c4a"
       }
+    },
+    "android": {
+      "package": "com.diaguitounkara.fundwise"
     }
   }
 }
