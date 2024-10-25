@@ -18,17 +18,10 @@ import {
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../UserContext";
-import { LineChart } from "react-native-chart-kit";
 
 const Home = () => {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
-
-  const [totalRevenu, setTotalRevenu] = useState(25000);
-  const [totalDepenses, setTotalDepenses] = useState(34000);
-
-  const [revenus, setRevenus] = useState([10000, 20000, 25000, 30000, 40000]);
-  const [depenses, setDepenses] = useState([15000, 25000, 30000, 35000, 40000]);
 
     // Fonction pour obtenir la salutation selon le moment de la journée
     const getGreeting = () => {
@@ -60,22 +53,6 @@ const Home = () => {
     fetchUserInfo();
   }, []);
 
-  const data = {
-    labels: ["Jan", "Fév", "Mar", "Avr", "Mai"],
-    datasets: [
-      {
-        data: revenus,
-        color: (opacity = 1) => `rgba(26, 188, 156, ${opacity})`, // couleur des revenus
-        strokeWidth: 2,
-      },
-      {
-        data: depenses,
-        color: (opacity = 1) => `rgba(231, 76, 60, ${opacity})`, // couleur des dépenses
-        strokeWidth: 2,
-      },
-    ],
-  };
-
   return (
     <SafeAreaView>
       <StatusBar backgroundColor="#078ECB" style="light" />
@@ -98,63 +75,7 @@ const Home = () => {
 
           {/* Section des Statistiques */}
           <View style={styles.statsContainer}>
-            <Text style={styles.statsTitle}>Statistiques</Text>
-            <Text style={styles.statsText}>
-              Revenu total: {totalRevenu} F CFA
-            </Text>
-            <Text style={styles.statsText}>
-              Dépenses totales: {totalDepenses} F CFA
-            </Text>
-
-            {/* Graphique */}
-            <LineChart
-              data={data}
-              width={320}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#ffffff",
-                backgroundGradientFrom: "#ffffff",
-                backgroundGradientTo: "#ffffff",
-                decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: "#ffa726",
-                },
-              }}
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-                alignSelf: "center",
-              }}
-            />
-
-            {/* Légende du graphique */}
-            <View style={styles.legendContainer}>
-              <View style={styles.legendItem}>
-                <View
-                  style={[
-                    styles.legendColor,
-                    { backgroundColor: "rgba(26, 188, 156, 1)" },
-                  ]}
-                />
-                <Text style={styles.legendText}>Revenus</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View
-                  style={[
-                    styles.legendColor,
-                    { backgroundColor: "rgba(231, 76, 60, 1)" },
-                  ]}
-                />
-                <Text style={styles.legendText}>Dépenses</Text>
-              </View>
-            </View>
+            
           </View>
 
           {/* Transactions */}
