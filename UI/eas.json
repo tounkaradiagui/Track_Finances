@@ -6,13 +6,13 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-       "android": {
-        "image": "latest"
-      }
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "image": "latest"
+      }
     },
     "production": {
       "autoIncrement": true
