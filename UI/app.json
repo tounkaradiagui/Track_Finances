@@ -1,5 +1,14 @@
 {
   "expo": {
+    "name": "Fund Wise",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/banking.png",
+    "splash": {
+      "image": "./assets/images/balance.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "extra": {
       "eas": {
         "projectId": "1b52765b-99c4-4bf5-b06b-08b76529fd6f"
@@ -8,7 +17,17 @@
     "owner": "diaguitounkara",
     "slug": "fund-wise",
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
       "package": "com.diaguitounkara.fundwise"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/images/welcome/Revenue-bro.png"
     }
   }
 }
