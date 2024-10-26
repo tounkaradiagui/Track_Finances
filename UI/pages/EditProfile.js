@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,6 +14,8 @@ import { API_URL } from "../config";
 import NetInfo from "@react-native-community/netinfo";
 import Toast from "react-native-toast-message";
 import { useUser } from "../UserContext";
+import * as ImagePicker from "expo-image-picker";
+import { FontAwesome } from "@expo/vector-icons";
 
 const EditProfile = () => {
   const { user, setUser } = useUser();
@@ -25,6 +28,7 @@ const EditProfile = () => {
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
+  const [image, setImage] = useState(null);
 
   // Fonction pour enregistrer les modifications
   const handleSave = async () => {
@@ -45,10 +49,18 @@ const EditProfile = () => {
       prenom: prenom,
       nom: nom,
       email: email,
+      image: image,
     };
 
     if (userId) {
       try {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: image,
+          name: "profile.jpg",
+          type: "image/jpeg",
+        });
+        formData.append("userData", JSON.stringify(userData));
         const response = await fetch(`${API_URL.editUserProfile}/${userId}`, {
           method: "PATCH",
           headers: {
@@ -79,17 +91,20 @@ const EditProfile = () => {
           prenom: updatedUserData.user.prenom || prev.prenom,
           nom: updatedUserData.user.nom || prev.nom,
           email: updatedUserData.user.email || prev.email,
+          image: updatedUserData.user.image || prev.image,
         }));
 
         // Mettre à jour les états locaux
         setPrenom(updatedUserData.user.prenom || "");
         setNom(updatedUserData.user.nom || "");
         setEmail(updatedUserData.user.email || "");
+        setImage(updatedUserData.user.image || "");
 
         Toast.show({
           type: "success",
           text1: "Profil mis à jour avec succès",
-          text2:"Vous pouvez maintenant vous connecter avec vos nouvelles infos",
+          text2:
+            "Vous pouvez maintenant vous connecter avec vos nouvelles infos",
           position: "top",
           visibilityTime: 5000,
         });
@@ -104,6 +119,38 @@ const EditProfile = () => {
           type: "error",
         });
       }
+    }
+  };
+
+  const pickImage = async () => {
+    // let result = await ImagePicker.launchImageLibraryAsync({
+    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //   allowsEditing: true,
+    //   quality: 1,
+    // });
+
+    // if (!result.canceled) {
+    //   console.log(result);
+    // } else {
+    //   alert('You did not select any image.');
+    // }
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled) {
+      console.log(pickerResult);
+      setImage(pickerResult.uri);
     }
   };
 
@@ -125,9 +172,15 @@ const EditProfile = () => {
         },
       });
 
-      const responseText = await response.text();
-
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -149,6 +202,7 @@ const EditProfile = () => {
       setPrenom(user.prenom);
       setNom(user.nom);
       setEmail(user.email);
+      setImage(user.image);
     } else {
       // Charge les données si l'utilisateur n'est pas déjà présent
       loadUserData();
@@ -158,6 +212,27 @@ const EditProfile = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Modifier le Profil</Text>
+
+      {/* {image && <Image source={{ uri: image }} style={styles.image} />}
+      <TouchableOpacity onPress={pickImage} style={styles.imagePickerButton}>
+        <Text style={styles.imagePickerText}>Choisir une image</Text>
+      </TouchableOpacity> */}
+
+      <TouchableOpacity onPress={pickImage}>
+        <View style={styles.ProfilePicture}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.ProfilePicture} />
+          ) : (
+            <Image
+              source={require("../assets/images/profile-picture.jpg")}
+              style={styles.ProfilePicture}
+            />
+          )}
+          <View style={styles.FeatherIcon}>
+            <FontAwesome name="camera" size={15} color="white" />
+          </View>
+        </View>
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -198,6 +273,44 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Makes the image circular
+    overflow: "hidden", // Ensures any overflow is hidden
+    marginBottom: 20,
+  },
+  imagePickerButton: {
+    backgroundColor: "#e0e0e0",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  imagePickerText: {
+    color: "#333",
+    fontSize: 16,
+  },
+  ProfilePicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Circular shape
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  FeatherIcon: {
+    width: 28,
+    height: 28,
+    backgroundColor: "#078ECB",
+    position: "absolute",
+    borderRadius: 30,
+    alignItems: "center",
+    right: -5,
+    bottom: 2,
+    paddingTop: 4,
   },
   input: {
     height: 50,

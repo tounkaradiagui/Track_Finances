@@ -12,7 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useUser } from "../UserContext";
 
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
@@ -89,7 +89,12 @@ const Profile = () => {
   useEffect(() => {
     fetchUserInfo();
   }, []);
-  
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchUserInfo();
+  //   }, [])
+  // );
 
   if (!user) {
     return <Text>Chargement...</Text>; // Affichez un message de chargement
@@ -111,9 +116,17 @@ const Profile = () => {
           <TouchableOpacity>
             <View style={styles.ProfilePicture}>
               <Image
-                source={require("../assets/images/profile-picture.jpg")}
+                source={{
+                  uri:
+                    user.avatar ||
+                    "https://www.congres-detergence.com/images/intervenants/photo-avatar-profil.png",
+                }}
                 style={styles.ProfilePicture}
               />
+              {/* <Image
+                source={require("../assets/images/profile-picture.jpg")}
+                style={styles.ProfilePicture}
+              /> */}
             </View>
             <View style={styles.FeatherIcon}>
               <FontAwesome name="camera" size={15} color="white" />

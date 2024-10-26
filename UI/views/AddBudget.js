@@ -20,18 +20,19 @@ const AddBudget = () => {
   if (!user) {
     return <Text>Chargement...</Text>; // Affichez un message de chargement
   }
-
-  const [userId, setUserId] = "";
   const [categoryId, setCategoryId] = useState("");
   const [period, setPeriod] = useState("mensuel");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
   const navigation = useNavigation();
   const [categories, setCategories] = useState([]);
 
   const handleCreateBudget = async () => {
     try {
+      setLoading(true)
       const token = await AsyncStorage.getItem("authToken");
       const userId = await AsyncStorage.getItem("userId");
 
@@ -57,6 +58,14 @@ const AddBudget = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -75,7 +84,16 @@ const AddBudget = () => {
       setCategoryId("");
       navigation.navigate("Budget");
     } catch (error) {
-      console.error("Erreur lors de la création du budget", error);
+        Toast.show({
+          text1: "Erreur",
+          text2: error.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+      // console.error("Erreur lors de la création du budget", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,6 +110,14 @@ const AddBudget = () => {
           },
         });
         if (!response.ok) {
+          const errorData = await response.json();
+          Toast.show({
+            text1: "Erreur",
+            text2: errorData.message,
+            type: "error",
+            position: "top",
+            visibilityTime: 3000,
+          });
           return;
         }
 
@@ -99,7 +125,14 @@ const AddBudget = () => {
         setCategories(data.categories); // Stocker les données dans l'état
         // console.log("Catégories récupérées:", data);
       } catch (error) {
-        console.error("Erreur lors de la récupération des catégories:", error);
+        Toast.show({
+          text1: "Erreur",
+          text2: error.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+        // console.error("Erreur lors de la récupération des catégories:", error);
       }
     };
 
@@ -196,8 +229,11 @@ const AddBudget = () => {
           marginTop: 20,
           alignItems: "center",
         }}
+        disabled={loading}
       >
-        <Text style={{ color: "white", fontWeight: "bold" }}>Créer Budget</Text>
+        <Text style={{ color: "white", fontWeight: "bold" }}>
+          {loading ? "En cours..." : " Créer Budget"}
+         </Text>
       </TouchableOpacity>
     </View>
   );

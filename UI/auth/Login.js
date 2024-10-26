@@ -164,6 +164,7 @@ const Login = () => {
             prenom: data.user.prenom,
             email: data.user.email,
             lastLogin: currentDate,
+            avatar: data.user.avatar,
         };
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfos));
         setUser(userInfos);

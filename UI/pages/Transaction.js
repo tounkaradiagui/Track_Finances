@@ -41,6 +41,14 @@ const Transaction = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -48,7 +56,14 @@ const Transaction = () => {
       setTransactions(data.transactions);
       // console.log(data);
     } catch (error) {
-      console.log(error);
+        Toast.show({
+          text1: "Erreur",
+          text2: error.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+      // console.log(error);
     }
   };
 
@@ -64,6 +79,14 @@ const Transaction = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       } else {
         const data = await response.json();
@@ -71,7 +94,13 @@ const Transaction = () => {
       }
 
     } catch (err) {
-      console.error("Erreur lors de la récupération des catégories:", err);
+        Toast.show({
+          text1: "Erreur",
+          text2: err.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
     }
   };
 

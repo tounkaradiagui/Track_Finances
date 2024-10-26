@@ -21,17 +21,41 @@ const ChangePassword = () => {
     setLoading(true);
 
     if(!oldPassword || oldPassword === "") {
-        Alert.alert("Error", "Ancien mot de passe est obligatoire");
+      Toast.show({
+        text1: "Erreur",
+        text2: "Ancien mot de passe est obligatoire",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
     else if(!newPassword || newPassword === "") {
-        Alert.alert("Error", "Nouveau mot de passe est obligatoire");
+      Toast.show({
+        text1: "Erreur",
+        text2: "Nouveau mot de passe est obligatoire",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
     else if(!confirmNewPassword || confirmNewPassword === "") {
-        Alert.alert("Error", "Confirmation du nouveau mot de passe est obligatoire");
+      Toast.show({
+        text1: "Erreur",
+        text2: "Confirmation du nouveau mot de passe est obligatoire",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
 
     if (newPassword !== confirmNewPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
+      Toast.show({
+        text1: "Erreur",
+        text2: "Les mots de passe ne correspondent pas.",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
       return;
     }
   
@@ -54,8 +78,16 @@ const ChangePassword = () => {
   
       // Vérifiez si la réponse est correcte avant de l'analyser
       if (!response.ok) {
-        const errorText = await response.text(); // Utilisez .text() pour obtenir le contenu brut
-        throw new Error(errorText || "Erreur lors de la modification du mot de passe");
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+        setLoading(false);
+        return;
       }
   
       Toast.show({
@@ -71,8 +103,14 @@ const ChangePassword = () => {
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (error) {
-      console.error(error);
-      Alert.alert("Erreur", error.message);
+      console.log(error);
+      Toast.show({
+        text1: "Erreur",
+        text2: error.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
     } finally {
       setLoading(false);
     }

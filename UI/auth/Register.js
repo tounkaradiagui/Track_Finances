@@ -349,7 +349,7 @@ const Register = () => {
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                placeholder="Adresse Email"
+                placeholder="Adresse email"
                 style={{
                   borderColor: "#078ECB",
                   color: "black",
@@ -435,7 +435,7 @@ const Register = () => {
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
                 style={{ width: 250 }}
-                placeholder="Confirmer le Mot de passe"
+                placeholder="Confirmer le mot de passe"
               />
 
               <MaterialCommunityIcons

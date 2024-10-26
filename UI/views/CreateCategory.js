@@ -27,6 +27,14 @@ const CreateCategory = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -41,7 +49,7 @@ const CreateCategory = () => {
         visibilityTime: 5000,
       });
     } catch (error) {
-      // console.error(error);
+      console.error(error);
       Toast.show({
         text1: "Erreur",
         text2: error.message,

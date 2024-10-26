@@ -191,6 +191,7 @@ const Login = async (req, res) => {
         email: user.email,
         nom: user.nom,
         lastLogin: user.lastLogin,
+        avatar: user.avatar
       },
       secretKey,
       { expiresIn: "7d" }
@@ -210,7 +211,7 @@ const Login = async (req, res) => {
         nom: user.nom,
         prenom: user.prenom,
         lastLogin: user.lastLogin,
-        // avatar:user.avatar,
+        avatar:user.avatar,
       },
     });
   } catch (error) {
@@ -521,7 +522,7 @@ const requestPasswordReset = async (req, res) => {
             </div>
             <div class="body">
                 <p>Vous avez demandé la réinitialisation de votre mot de passe. Veuillez suivre ce lien pour réinitialiser votre mot de passe : 
-                <a href="http://192.168.200.140:5000/api/auth/reset-password/${token}">Réinitialiser le mot de passe</a></p>
+                <a href="#">Réinitialiser le mot de passe</a></p>
                 <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet e-mail.</p>
             </div>
             <div class="footer">
@@ -531,6 +532,7 @@ const requestPasswordReset = async (req, res) => {
         </html>
       `,
     };
+    // http://192.168.200.140:5000/api/auth/reset-password/${token}
 
     // Envoie l'e-mail
     await transporter.sendMail(mailOptions);

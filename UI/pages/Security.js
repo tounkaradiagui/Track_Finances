@@ -45,10 +45,13 @@ const Security = () => {
         });
 
       } else {
+        const errorData = await response.json();
         Toast.show({
           text1: "Erreur",
-          text2: "La suppression de votre compte a échoué. Veuillez réessayer.",
+          text2: errorData.message,
           type: "error",
+          position: "top",
+          visibilityTime: 3000,
         });
       }
     } catch (error) {

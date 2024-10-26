@@ -38,13 +38,28 @@ const Categories = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (error) {
-      console.log("Erreur lors de la récupération des catégories:", error);
+      Toast.show({
+        text1: "Erreur",
+        text2: error.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      // console.log("Erreur lors de la récupération des catégories:", error);
     }
   };
 

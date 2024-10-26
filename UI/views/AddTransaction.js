@@ -59,6 +59,14 @@ const AddTransaction = () => {
       });
   
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
   
@@ -104,6 +112,14 @@ const AddTransaction = () => {
         },
       });
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -112,7 +128,14 @@ const AddTransaction = () => {
       // Stocker les données dans l'état
       // console.log("Catégories récupérées:", data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des catégories:", error);
+        Toast.show({
+          text1: "Erreur",
+          text2: error.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+      // console.error("Erreur lors de la récupération des catégories:", error);
     }
   };
 
@@ -131,6 +154,14 @@ const AddTransaction = () => {
       });
   
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
   
@@ -138,8 +169,15 @@ const AddTransaction = () => {
       // console.log("Budgets récupérés:", data.budget); // Log pour débogage
       setBudgets(data.budget || []);
     } catch (err) {
+        Toast.show({
+          text1: "Erreur",
+          text2: err.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
       // console.error("Erreur lors de la récupération des budgets:", err);
-      setError(err.message);
+      // setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -257,9 +295,10 @@ const AddTransaction = () => {
           marginTop: 20,
           alignItems: "center",
         }}
+        disabled={loading}
       >
         <Text style={{ color: "white", fontWeight: "bold" }}>
-          Créer Transaction
+          {loading ? "En cours..." : "Créer Transaction"}
         </Text>
       </TouchableOpacity>
     </View>
