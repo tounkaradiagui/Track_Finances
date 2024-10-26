@@ -2,9 +2,11 @@
   "expo": {
     "extra": {
       "eas": {
-        "projectId": "48042aec-3ff2-469d-ac85-2ad808df9c4a"
+        "projectId": "1b52765b-99c4-4bf5-b06b-08b76529fd6f"
       }
     },
+    "owner": "diaguitounkara",
+    "slug": "fund-wise",
     "android": {
       "package": "com.diaguitounkara.fundwise"
     }
