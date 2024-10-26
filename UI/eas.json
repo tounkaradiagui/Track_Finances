@@ -4,17 +4,12 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "production": {
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
-    },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+       "android": {
+        "image": "latest"
+      },
     },
     "preview": {
       "distribution": "internal"
