@@ -9,7 +9,7 @@
       "distribution": "internal",
        "android": {
         "image": "latest"
-      },
+      }
     },
     "preview": {
       "distribution": "internal"
