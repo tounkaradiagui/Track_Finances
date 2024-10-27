@@ -192,14 +192,10 @@ const Login = async (req, res) => {
         nom: user.nom,
         lastLogin: user.lastLogin,
         avatar: user.avatar
-      },
-      secretKey,
-      { expiresIn: "7d" }
-    );
+      } secretKey);
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      secure: process.env.NODE_ENV === "production"
     });
 
     res.status(200).json({
