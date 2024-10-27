@@ -103,7 +103,137 @@ const Home = () => {
                 <Text
                   style={{ fontSize: 18, fontWeight: "bold", color: "black" }}
                 >
-                  All
+                  Voir
+                </Text>
+                <MaterialIcons
+                  name="keyboard-arrow-right"
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#078ECB",
+              marginHorizontal: 15,
+              // borderBottomLeftRadius: 20,
+              // borderBottomRightRadius: 20,
+            }}
+          >
+            <View>
+              <View style={{ flexDirection: "row" }}>
+                <Entypo name="shopping-cart" size={24} color="white" />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Achats
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", marginTop: 5 }}>
+                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date</Text> */}
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Vendredi 18/10/2023 15:20 min
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
+            >
+              {" "}
+              - 30.000 F CFA{" "}
+            </Text>
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#078ECB",
+              marginHorizontal: 15,
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+            }}
+          >
+            <View>
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome name="wifi" size={24} color="white" />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Abonnement
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", marginTop: 5 }}>
+                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date : </Text> */}
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginLeft: 10,
+                  }}
+                >
+                  Lundi 12/10/2023 09:30 min
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
+            >
+              {" "}
+              - 200.000 F CFA{" "}
+            </Text>
+          </View>
+
+          {/* Objectif financiers */}
+          <View
+            style={{
+              marginTop: 20,
+              paddingHorizontal: 15,
+              padding: 10,
+              justifyContent: "space-between",
+              flexDirection: "row",
+              backgroundColor: "#E9B94E",
+              marginHorizontal: 15,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          >
+            <View>
+              <Text style={styles.name}>Objectif Financiers</Text>
+            </View>
+            <View>
+              <TouchableOpacity
+                style={{ flexDirection: "row" }}
+                onPress={() => navigation.navigate("Goal")}
+              >
+                <Text
+                  style={{ fontSize: 18, fontWeight: "bold", color: "black" }}
+                >
+                  Voir
                 </Text>
                 <MaterialIcons
                   name="keyboard-arrow-right"

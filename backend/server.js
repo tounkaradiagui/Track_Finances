@@ -10,6 +10,7 @@ const authRoutes = require('./routes/userRoutes.js');
 const categoryRoutes = require('./routes/categoryRoutes.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
 const budgetRoutes = require('./routes/budgetRoutes.js');
+const goalRoutes = require('./routes/goalRoutes.js');
 
 dotenv.config();
 connectBD();
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auth/user', categoryRoutes);
 app.use('/api/auth', transactionRoutes);
 app.use('/api/auth/budget', budgetRoutes);
+app.use('/api/auth/goals', goalRoutes);
 
 //Pour les requetes des page inexistantes, renvoie la view suivante
 app.all('*',(req, res) => {

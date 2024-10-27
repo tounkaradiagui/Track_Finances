@@ -7,7 +7,7 @@ const User = require("../models/User.js");
 
 const Register = async (req, res) => {
   try {
-    const { nom, prenom, email, password, confirmPassword, userType } =
+    const { nom, prenom, email, password, confirmPassword } =
       req.body;
 
     //Verifier si les champs ne sont pas vide
@@ -192,7 +192,7 @@ const Login = async (req, res) => {
         nom: user.nom,
         lastLogin: user.lastLogin,
         avatar: user.avatar
-      } secretKey);
+      }, secretKey);
     res.cookie("Authorization", "Bearer " + token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production"
@@ -208,6 +208,7 @@ const Login = async (req, res) => {
         prenom: user.prenom,
         lastLogin: user.lastLogin,
         avatar:user.avatar,
+        userType:user.userType
       },
     });
   } catch (error) {
@@ -219,16 +220,22 @@ const Login = async (req, res) => {
 const UpdateUserProfile = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const { nom, prenom, email } = req.body;
+    const { nom, prenom, email, avatar, userType } = req.body;
 
     // Vérifiez si userId est une chaîne valide avant de faire la requête
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "ID utilisateur invalide" });
     }
 
+    // Vérifiez si l'email existe déjà
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser._id.toString() !== userId) {
+      return res.status(400).json({ message: "L'email est déjà utilisé par un autre utilisateur" });
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
-      { nom, prenom, email },
+      { nom, prenom, email, avatar, userType },
       { new: true }
     );
 
@@ -237,7 +244,7 @@ const UpdateUserProfile = async (req, res) => {
     }
 
     // Exclure le mot de passe et le type d'utilisateur de la réponse
-    const { password, userType, createdAt, ...userResponse } = user.toObject();
+    const { password, confirmPassword, createdAt, ...userResponse } = user.toObject();
 
     // Inclure updatedAt dans la réponse
     userResponse.updatedAt = user.updatedAt;

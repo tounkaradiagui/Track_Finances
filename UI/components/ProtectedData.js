@@ -16,6 +16,7 @@ import EditProfile from '../pages/EditProfile';
 import Security from '../pages/Security';
 import ChangePassword from './ChangePassword';
 import TransactionDetails from '../views/TransactionDetails';
+import Goal from '../pages/Goal';
 
 const ProtectedData = () => {
     const Stack = createNativeStackNavigator();
@@ -32,6 +33,7 @@ const ProtectedData = () => {
             <Stack.Screen name="Settings" component={Settings} options={{ title: 'Paramètre'}}/>
             <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ title: 'Mon Compte'}}/>
             <Stack.Screen name="About" component={About} options={{ title: 'A Propos'}}/>
+            <Stack.Screen name="Goal" component={Goal} options={{ title: 'Mes objectifs'}}/>
 
             {/* Manage categories */}
             <Stack.Screen name="CreateCategory" component={CreateCategory} options={{ title: 'Catégorie'}}/>

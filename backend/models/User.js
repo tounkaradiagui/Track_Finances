@@ -10,8 +10,8 @@ const UserSchema = new mongoose.Schema({
     avatar: {type: String, required: false, default: 'https://www.congres-detergence.com/images/intervenants/photo-avatar-profil.png'},
     userType: { 
         type: String, 
-        enum: ["ouvrier", "gestionnaire", "etudiant", "freelance", "fonctionnaire", "commerçant", "chauffeur"], 
-        default: "freelance", 
+        enum: ["Ouvrier", "Gestionnaire", "Etudiant", "Freelance", "Fonctionnaire", "Commerçant", "Chauffeur"], 
+        default: "Freelance", 
         required: false 
     },
     resetPasswordToken: String,
