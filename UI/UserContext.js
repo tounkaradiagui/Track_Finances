@@ -4,8 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // Utilisez null au lieu d'une chaîne vide
-
+    const [user, setUser] = useState(null);
     useEffect(() => {
         const getUserData = async () => {
             try {

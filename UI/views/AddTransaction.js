@@ -79,7 +79,7 @@ const AddTransaction = () => {
       // Rafraîchir les budgets
       await fetchBudgets(); 
 
-      navigation.navigate("Transaction");
+      navigation.goBack("Transaction");
       Toast.show({
         type: "success",
         text1: "Féliciations !!",

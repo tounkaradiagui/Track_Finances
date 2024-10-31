@@ -82,7 +82,7 @@ const AddBudget = () => {
       setDescription("");
       setPeriod("");
       setCategoryId("");
-      navigation.navigate("Budget");
+      navigation.goBack("Budget");
     } catch (error) {
         Toast.show({
           text1: "Erreur",

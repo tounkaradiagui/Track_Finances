@@ -45,7 +45,7 @@ const getCategories = async (req, res) => {
 
         // Vérifier si l'utilisateur n'a pas de catégories
         if (categories.length === 0) {
-            return res.status(404).json({ message: "Aucune catégorie trouvée pour cet utilisateur." });
+            return res.status(404).json({ message: "Aucune catégorie disponible." });
         }
 
         // Retourner les catégories
@@ -55,8 +55,6 @@ const getCategories = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
     }
 };
-
-
 
 const updateCategory = async (req, res) => {
     try {

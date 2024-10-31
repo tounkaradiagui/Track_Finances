@@ -1,5 +1,6 @@
 const BASE_URL = 'https://track-finances.onrender.com';
-// const BASE_URL = 'http://192.168.200.140:5000';
+// const BASE_URL = 'http://192.168.160.140:5000';
+
 
 export const API_URL = {
     register: `${BASE_URL}/api/auth/register`,
@@ -22,5 +23,10 @@ export const API_URL = {
     changePassword: `${BASE_URL}/api/auth/user/profile/change-password`,
 
     requestReset: `${BASE_URL}/api/auth/request-password-reset`,
-    resetPassword: `${BASE_URL}/api/auth/reset-password`
+    resetPassword: `${BASE_URL}/api/auth/reset-password`,
+
+    fetchGoals: `${BASE_URL}/api/auth/goals/my-goal`,
+    createGoal: `${BASE_URL}/api/auth/goals/my-goal`,
+    showGoal: `${BASE_URL}/api/auth/goals/show-goal`,
+    saveForGoal: `${BASE_URL}/api/auth/goals/my-goal/saving/:id`,
 };

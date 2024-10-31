@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
 const CreateCategory = () => {
+  
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
@@ -40,7 +41,7 @@ const CreateCategory = () => {
 
       setName('');
       setDescription('');
-      navigation.navigate("Categories");
+      navigation.goBack("Categories");
       Toast.show({
         type: "success",
         text1: "Féliciations !!",

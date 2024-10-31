@@ -12,16 +12,19 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { API_URL } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const Budget = () => {
   const [budget, setBudget] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const [error, setError] = useState(null);
+  
 
   const fetchBudgets = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         throw new Error("Token d'authentification manquant");
@@ -43,20 +46,13 @@ const Budget = () => {
           position: "top",
           visibilityTime: 3000,
         });
-        return;;
+        return;
       }
 
       const data = await response.json();
       setBudget(data.budget || []);
     } catch (err) {
-        Toast.show({
-          text1: "Erreur",
-          text2: err.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
-      setError(err.message);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -74,35 +70,20 @@ const Budget = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
       const data = await response.json();
       setCategories(data.categories || []);
     } catch (err) {
-      const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: err.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
+      console.log(err);
     }
   };
 
-  useEffect(() => {
-    fetchBudgets();
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   fetchBudgets();
+  //   fetchCategories();
+  // }, []);
 
   useFocusEffect(
     useCallback(() => {

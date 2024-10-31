@@ -74,9 +74,9 @@ const Home = () => {
           </View>
 
           {/* Section des Statistiques */}
-          <View style={styles.statsContainer}>
+          {/* <View style={styles.statsContainer}>
             
-          </View>
+          </View> */}
 
           {/* Transactions */}
           <View
@@ -337,6 +337,9 @@ const Home = () => {
               - 200.000 F CFA{" "}
             </Text>
           </View>
+
+
+          {/* Epargne */}
         </View>
       </ScrollView>
     </SafeAreaView>

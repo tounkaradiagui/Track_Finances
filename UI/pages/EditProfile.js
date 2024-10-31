@@ -71,7 +71,6 @@ const EditProfile = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          // console.error("Erreur lors de la mise à jour :", errorData);
           Toast.show({
             type: "error",
             text1: "Erreur",
@@ -110,9 +109,9 @@ const EditProfile = () => {
         });
 
         await loadUserData(); // Assurez-vous que cela appelle la bonne URL
-        navigation.navigate("Profile");
+        navigation.goBack("Profile");
       } catch (error) {
-        // console.error("Erreur lors de la mise à jour des données :", error);
+        console.error("Erreur :", error);
         Toast.show({
           text1: "Erreur",
           text2: "Échec de la mise à jour. Veuillez réessayer.",
@@ -123,17 +122,6 @@ const EditProfile = () => {
   };
 
   const pickImage = async () => {
-    // let result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //   allowsEditing: true,
-    //   quality: 1,
-    // });
-
-    // if (!result.canceled) {
-    //   console.log(result);
-    // } else {
-    //   alert('You did not select any image.');
-    // }
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -162,9 +150,6 @@ const EditProfile = () => {
       }
 
       const url = `${API_URL.editUserProfile}/${userId}`;
-      // URL de la requête
-      // console.log("Requête vers l'URL :", url);
-
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -204,7 +189,7 @@ const EditProfile = () => {
       setEmail(user.email);
       setImage(user.image);
     } else {
-      // Charge les données si l'utilisateur n'est pas déjà présent
+      // Charger les données si l'utilisateur n'est pas déjà présent
       loadUserData();
     }
   }, [user]);

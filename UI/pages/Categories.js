@@ -13,11 +13,13 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../config";
 import { COLORS } from "../constants";
+import Toast from "react-native-toast-message";
 
 const Categories = () => {
   const navigation = useNavigation();
   const [categories, setCategories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -27,6 +29,7 @@ const Categories = () => {
   }, []);
 
   const fetchCategories = async () => {
+    setLoading(true);
     try {
       const token = await AsyncStorage.getItem("authToken");
       const response = await fetch(API_URL.getCategories, {
@@ -38,28 +41,17 @@ const Categories = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
       const data = await response.json();
+      // const sorteCategories = Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)): [];
+      // setCategories(sorteCategories);
       setCategories(data.categories || []);
     } catch (error) {
-      Toast.show({
-        text1: "Erreur",
-        text2: error.message,
-        type: "error",
-        position: "top",
-        visibilityTime: 3000,
-      });
-      // console.log("Erreur lors de la récupération des catégories:", error);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,7 +91,11 @@ const Categories = () => {
           <AntDesign name="plussquare" size={30} color={"#E9B94E"} />
         </TouchableOpacity>
       </View>
-      {categories.length === 0 ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Chargement...</Text>
+        </View>
+      ) : categories.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Aucune catégorie disponible</Text>
         </View>
@@ -135,6 +131,15 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     color: '#999',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
   },
   title: {
     fontSize: 24,

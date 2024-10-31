@@ -14,11 +14,14 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../config";
 import { COLORS } from "../constants";
+import Toast from "react-native-toast-message";
 
 const Transaction = () => {
   const navigation = useNavigation();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -30,6 +33,7 @@ const Transaction = () => {
   }, []);
 
   const fetchTransactions = async () => {
+    setLoading(true);
     try {
       await AsyncStorage.getItem("authToken");
       const response = await fetch(API_URL.getTransactions, {
@@ -41,29 +45,18 @@ const Transaction = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
       const data = await response.json();
+      // const sorteTransactions = Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)): [];
+      // setTransactions(sorteTransactions);
       setTransactions(data.transactions);
       // console.log(data);
     } catch (error) {
-        Toast.show({
-          text1: "Erreur",
-          text2: error.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
-      // console.log(error);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,14 +72,6 @@ const Transaction = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       } else {
         const data = await response.json();
@@ -94,13 +79,7 @@ const Transaction = () => {
       }
 
     } catch (err) {
-        Toast.show({
-          text1: "Erreur",
-          text2: err.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
+      console.log(err);
     }
   };
 
@@ -157,7 +136,11 @@ const Transaction = () => {
             <AntDesign name="plussquare" size={30} color="#E9B94E" />
           </TouchableOpacity>
         </View>
-        {transactions.length === 0 ? (
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Chargement...</Text>
+          </View>
+        ) : transactions.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Aucune transaction disponible</Text>
           </View>
@@ -226,6 +209,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: "#007BFF", // Couleur bleue pour le type de transaction
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
   },
   transactionAmount: {
     fontSize: 20,
