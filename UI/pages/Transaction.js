@@ -97,7 +97,7 @@ const Transaction = () => {
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
   };
 
   const renderTransactionItem = ({ item }) => {

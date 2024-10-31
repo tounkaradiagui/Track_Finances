@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   Ionicons,
   MaterialIcons,
@@ -18,22 +18,33 @@ import {
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../UserContext";
+import { API_URL } from "../config";
 
 const Home = () => {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [goals, setGoals] = useState([]);
 
-    // Fonction pour obtenir la salutation selon le moment de la journée
-    const getGreeting = () => {
-      const hour = new Date().getHours();
-      if (hour < 12) {
-        return "Bonjour"; // Matin
-      } else if (hour < 18) {
-        return "Bon après-midi"; // Après-midi
-      } else {
-        return "Bonsoir"; // Soir
-      }
-    };
+  // Fonction pour obtenir la salutation selon le moment de la journée
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      return "Bonjour"; // Matin
+    } else if (hour < 18) {
+      return "Bon après-midi"; // Après-midi
+    } else {
+      return "Bonsoir"; // Soir
+    }
+  };
+
+  // Fonction pour formater la date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+    return date.toLocaleDateString("fr-FR", options); // Format français
+  };
 
   const fetchUserInfo = async () => {
     try {
@@ -49,14 +60,79 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      await AsyncStorage.getItem("authToken");
+      const response = await fetch(API_URL.getTransactions, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Vérifiez si la réponse est correcte
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      setTransactions(data.transactions);
+      // console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchGoals = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      const userId = await AsyncStorage.getItem("userId");
+      const response = await fetch(`${API_URL.fetchGoals}/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      // console.log(data);
+
+      // Formater les dates et trier les objectifs ici
+      const formattedGoals = data.map((goal) => ({
+        ...goal,
+        deadline: formatDate(goal.deadline), // Formater la date
+      }));
+
+      // Trier les objectifs par date de création (plus récent en premier)
+      const sortedGoals = Array.isArray(formattedGoals)
+        ? formattedGoals.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          )
+        : [];
+      setGoals(sortedGoals);
+    } catch (error) {
+      console.error("Fetch goals error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserInfo();
+      fetchTransactions();
+      fetchGoals();
+    }, [])
+  );
 
   return (
     <SafeAreaView>
-      <StatusBar backgroundColor="#078ECB" style="light" />
       <ScrollView showsVerticalScrollIndicator={false}>
+      <StatusBar backgroundColor="#078ECB" style="light" />
         <View>
           <View style={styles.headerTop}>
             <Text style={styles.salutation}>{getGreeting()},</Text>
@@ -64,7 +140,9 @@ const Home = () => {
 
           <View style={styles.header}>
             <View>
-              <Text style={styles.name}>{user.prenom} {user.nom} !</Text>
+              <Text style={styles.name}>
+                {user.prenom} {user.nom} !
+              </Text>
             </View>
             <View>
               <TouchableOpacity>
@@ -113,101 +191,87 @@ const Home = () => {
               </TouchableOpacity>
             </View>
           </View>
+
           <View
             style={{
               paddingHorizontal: 15,
               padding: 10,
-              justifyContent: "space-between",
-              flexDirection: "row",
               backgroundColor: "#078ECB",
               marginHorizontal: 15,
-              // borderBottomLeftRadius: 20,
-              // borderBottomRightRadius: 20,
             }}
           >
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <Entypo name="shopping-cart" size={24} color="white" />
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Achats
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Chargement...</Text>
+              </View>
+            ) : transactions.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
+                  Aucune transaction disponible
                 </Text>
               </View>
-              <View style={{ flexDirection: "row", marginTop: 5 }}>
-                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date</Text> */}
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Vendredi 18/10/2023 15:20 min
-                </Text>
-              </View>
-            </View>
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
-            >
-              {" "}
-              - 30.000 F CFA{" "}
-            </Text>
-          </View>
-          <View
-            style={{
-              paddingHorizontal: 15,
-              padding: 10,
-              justifyContent: "space-between",
-              flexDirection: "row",
-              backgroundColor: "#078ECB",
-              marginHorizontal: 15,
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-            }}
-          >
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <FontAwesome name="wifi" size={24} color="white" />
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Abonnement
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 5 }}>
-                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date : </Text> */}
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Lundi 12/10/2023 09:30 min
-                </Text>
-              </View>
-            </View>
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
-            >
-              {" "}
-              - 200.000 F CFA{" "}
-            </Text>
+            ) : (
+              transactions.slice(0, 3).map((transaction, index) => (
+                <View key={transaction._id}>
+                  <View
+                    style={{
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      backgroundColor: "#078ECB",
+                      borderBottomLeftRadius: index === 2 ? 20 : 0,
+                      borderBottomRightRadius: index === 2 ? 20 : 0,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <Entypo name="shopping-cart" size={24} color="white" />
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "white",
+                          marginLeft: 10,
+                        }}
+                      >
+                        {transaction.type}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#E9B94E",
+                      }}
+                    >
+                      {transaction.amount} F CFA
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      color: "white",
+                      marginLeft: 34, // Pour aligner avec l'icône et le texte
+                      marginTop: 5,
+                    }}
+                  >
+                    {new Date(transaction.createdAt).toLocaleString("fr-FR")}
+                  </Text>
+
+                  {index < transactions.length - 1 && (
+                    <View
+                      style={{
+                        borderBottomWidth: 1,
+                        borderBottomColor: "white",
+                        marginVertical: 10,
+                      }}
+                    />
+                  )}
+                </View>
+              ))
+            )}
           </View>
 
+          {/* Objectif financiers */}
           {/* Objectif financiers */}
           <View
             style={{
@@ -218,12 +282,10 @@ const Home = () => {
               flexDirection: "row",
               backgroundColor: "#E9B94E",
               marginHorizontal: 15,
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
             }}
           >
             <View>
-              <Text style={styles.name}>Objectif Financiers</Text>
+              <Text style={styles.name}>Objectifs Financiers</Text>
             </View>
             <View>
               <TouchableOpacity
@@ -247,97 +309,79 @@ const Home = () => {
             style={{
               paddingHorizontal: 15,
               padding: 10,
-              justifyContent: "space-between",
-              flexDirection: "row",
-              backgroundColor: "#078ECB",
-              marginHorizontal: 15,
-              // borderBottomLeftRadius: 20,
-              // borderBottomRightRadius: 20,
-            }}
-          >
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <Entypo name="shopping-cart" size={24} color="white" />
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Achats
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", marginTop: 5 }}>
-                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date</Text> */}
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Vendredi 18/10/2023 15:20 min
-                </Text>
-              </View>
-            </View>
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
-            >
-              {" "}
-              - 30.000 F CFA{" "}
-            </Text>
-          </View>
-          <View
-            style={{
-              paddingHorizontal: 15,
-              padding: 10,
-              justifyContent: "space-between",
-              flexDirection: "row",
               backgroundColor: "#078ECB",
               marginHorizontal: 15,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
             }}
           >
-            <View>
-              <View style={{ flexDirection: "row" }}>
-                <FontAwesome name="wifi" size={24} color="white" />
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Abonnement
-                </Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Chargement...</Text>
               </View>
-              <View style={{ flexDirection: "row", marginTop: 5 }}>
-                {/* <Text style={{ fontSize: 10, fontWeight: "bold", color: "white", marginLeft:5 }}>Date : </Text> */}
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    color: "white",
-                    marginLeft: 10,
-                  }}
-                >
-                  Lundi 12/10/2023 09:30 min
-                </Text>
+            ) : goals.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Aucun objectif disponible</Text>
               </View>
-            </View>
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", color: "#E9B94E" }}
-            >
-              {" "}
-              - 200.000 F CFA{" "}
-            </Text>
+            ) : (
+              goals.slice(0, 2).map((goal, index) => (
+                <View key={goal._id}>
+                  <View
+                    style={{
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      backgroundColor: "#078ECB",
+                      borderBottomLeftRadius: index === 1 ? 20 : 0,
+                      borderBottomRightRadius: index === 1 ? 20 : 0,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <Entypo name="shopping-cart" size={24} color="white" />
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "white",
+                          marginLeft: 10,
+                        }}
+                      >
+                        {goal.name}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#E9B94E",
+                      }}
+                    >
+                      {goal.targetAmount} F CFA
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      color: "white",
+                      marginLeft: 34,
+                      marginTop: 5,
+                    }}
+                  >
+                    Date ciblée : {goal.deadline}
+                  </Text>
+                  {index < transactions.length - 1 && (
+                    <View
+                      style={{
+                        borderBottomWidth: 1,
+                        borderBottomColor: "white",
+                        marginVertical: 10,
+                      }}
+                    />
+                  )}
+                </View>
+              ))
+            )}
           </View>
-
 
           {/* Epargne */}
         </View>
@@ -353,7 +397,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     paddingHorizontal: 10,
-    marginTop:10
+    marginTop: 10,
   },
   header: {
     flexDirection: "row",
