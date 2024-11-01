@@ -111,7 +111,7 @@ const EditProfile = () => {
         await loadUserData(); // Assurez-vous que cela appelle la bonne URL
         navigation.goBack("Profile");
       } catch (error) {
-        console.error("Erreur :", error);
+        console.erlogror("Erreur :", error);
         Toast.show({
           text1: "Erreur",
           text2: "Échec de la mise à jour. Veuillez réessayer.",

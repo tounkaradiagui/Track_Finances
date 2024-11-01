@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
+const generateSecretKey = require('../utils/generateToken.js')
 
 const Register = async (req, res) => {
   try {
@@ -120,7 +121,8 @@ const Register = async (req, res) => {
                 </ul>
 
               <h2>L'importance de notre application</h2>
-                <p>Avec FundWise, vous pouvez prendre des décisions financières éclairées et planifier efficacement vos objectifs.</p>
+                <p>Aimport { generateSecretKey } from './../utils/generateToken';
+vec FundWise, vous pouvez prendre des décisions financières éclairées et planifier efficacement vos objectifs.</p>
 
                 <h2>Prêt à commencer ?</h2>
                 <p>Connectez-vous à votre compte et explorez toutes les fonctionnalités. Si vous avez des questions, contactez notre support contact@fundWise.com.</p>
@@ -157,7 +159,7 @@ const generateSecretKey = () => {
 };
 
 // Create a secret key
-const secretKey = generateSecretKey();
+export const secretKey = generateSecretKey();
 
 const Login = async (req, res) => {
   try {
@@ -185,22 +187,20 @@ const Login = async (req, res) => {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        nom: user.nom,
-        lastLogin: user.lastLogin,
-        avatar: user.avatar
-      }, secretKey);
-    res.cookie("Authorization", "Bearer " + token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
-    });
+    // const token = jwt.sign({userId: user._id,}, secretKey, {expiresIn: "7d"});
+    // res.cookie("Authorization", "Bearer " + token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
+
+    generateSecretKey(res, user._id);
 
     res.status(200).json({
       message: "Vous êtes connecté",
-      token,
+      // token,
+      generateSecretKey,
       user: {
         _id: user._id,
         email: user.email,

@@ -38,7 +38,7 @@ const ShowGoal = ({ route }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
+        // console.error("Error response:", errorData);
         Toast.show({
           text1: "Erreur",
           text2:
@@ -53,7 +53,7 @@ const ShowGoal = ({ route }) => {
       const data = await response.json();
       setGoal(data);
     } catch (error) {
-      console.error("Fetch goal error:", error);
+      console.log("Fetch goal error:", error);
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ const ShowGoal = ({ route }) => {
       setSavingAmount("");
       navigation.goBack("Goal");
     } catch (error) {
-      console.error("Error saving amount:", error);
+      console.log("Error saving amount:", error);
     }
   };
 

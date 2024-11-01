@@ -53,7 +53,7 @@ const Home = () => {
         setUser(JSON.parse(storedUserInfo));
       }
     } catch (error) {
-      console.error(
+      console.log(
         "Erreur lors de la récupération des informations utilisateur :",
         error
       );
@@ -115,7 +115,7 @@ const Home = () => {
         : [];
       setGoals(sortedGoals);
     } catch (error) {
-      console.error("Fetch goals error:", error);
+      console.log("Fetch goals error:", error);
     } finally {
       setLoading(false);
     }

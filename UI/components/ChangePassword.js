@@ -103,7 +103,7 @@ const ChangePassword = () => {
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       Toast.show({
         text1: "Erreur",
         text2: error.message,

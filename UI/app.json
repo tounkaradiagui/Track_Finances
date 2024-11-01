@@ -24,7 +24,8 @@
       "package": "com.diaguitounkara.fundwise"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.diaguitounkara.fundwise"
     },
     "web": {
       "favicon": "./assets/images/welcome/Revenue-bro.png"

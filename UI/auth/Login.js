@@ -147,7 +147,7 @@ const Login = () => {
         }
 
         const data = await response.json();
-        console.log("Données de l’utilisateur:", data);
+        // console.log("Données de l’utilisateur:", data);
         setLoading(false);
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -155,7 +155,7 @@ const Login = () => {
         // Stocker le token
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem("userId", data.user._id);
-        console.log("ID utilisateur stocké :", data.user._id);
+        // console.log("ID utilisateur stocké :", data.user._id);
         
         // Stocker les informations utilisateur
         const userInfos = {
@@ -168,7 +168,7 @@ const Login = () => {
         };
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfos));
         setUser(userInfos);
-        console.log(userInfos);
+        // console.log(userInfos);
 
         // Naviguer vers l'écran principal
         navigation.navigate("ProtectedData");

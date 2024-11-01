@@ -25,7 +25,7 @@ const Savings = () => {
           setGoals(sortedGoals);
           // setGoals(Array.isArray(data) ? data : []);
         } catch (error) {
-          console.error("Fetch goals error:", error);
+          console.log("Fetch goals error:", error);
         } finally {
           setLoading(false);
         }

@@ -70,7 +70,7 @@ const Goal = () => {
         : [];
       setGoals(sortedGoals);
     } catch (error) {
-      console.error("Fetch goals error:", error);
+      console.log("Fetch goals error:", error);
     } finally {
       setLoading(false);
     }

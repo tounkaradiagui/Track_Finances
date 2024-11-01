@@ -60,7 +60,7 @@ const Profile = () => {
 
   const clearAuthToken = async () => {
     await AsyncStorage.removeItem("authToken");
-    console.log("Token removed");
+    // console.log("Token removed");
     setUser(null);
     navigation.navigate("PublicScreen", { screen: "Login" });
     Toast.show({
