@@ -1,5 +1,6 @@
 const express = require("express");
 const Goal = require("../models/Goal.js");
+const mongoose = require("mongoose");
 
 // Définir un objectif financier
 const newGoal = async (req, res) => {
@@ -36,6 +37,11 @@ const saveForGoal = async (req, res) => {
       return res.status(400).json({ message: "Le montant doit être un nombre valide." });
     }
 
+    // Vérifier si le montant total dépasse le montant ciblé:
+    if (goal.currentSaved + numericAmount > goal.targetAmount) {
+      return res.status(400).json({ message: "Le montant total ne peut pas dépasserait l'objectif de"});
+    }
+
     goal.currentSaved += numericAmount;
     await goal.save();
     return res.status(200).json(goal);
@@ -47,11 +53,9 @@ const saveForGoal = async (req, res) => {
 // Trouver les objectifs financiers de chaque utilisateur
 const getGoals = async (req, res) => {
   const { userId } = req.params;
-  // console.log("Fetching goals for userId:", userId); // Ajoutez ceci
   try {
     const goals = await Goal.find({ userId });
-    console.log("Goals fetched:", goals); // Log des objectifs récupérés
-    if (goals.length === 0) {
+    if(!goals) {
       return res.status(404).json({ message: "Aucun objectif trouvé !" });
     }
     return res.status(200).json(goals);
@@ -94,5 +98,23 @@ const showSingleGoal = async (req, res) => {
   }
 };
 
+const deleteGoal = async (req, res) => {
+  const { id } = req.params;
+  // Vérifier si l'ID fourni par user est valide
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "ID invalide" });
+  }
+  try {
+    const goal = await Goal.findByIdAndDelete(id);
+    if (!goal) {
+      return res.status(404).json({ message: "Aucun objectif trouvé !" });
+    }
+    return res.status(200).json({ message: "Objectif supprimé avec succès"});
+  } catch (error) {
+    console.log("Error deleting goal:", error); // Log l'erreur
+    return res.status(500).json({ message: "Erreur de serveur" });
+  }
+};
 
-module.exports = { newGoal, saveForGoal, getGoals, checkProgress, showSingleGoal };
+
+module.exports = { newGoal, saveForGoal, getGoals, checkProgress, showSingleGoal, deleteGoal };

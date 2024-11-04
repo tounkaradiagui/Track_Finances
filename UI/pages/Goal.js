@@ -53,9 +53,20 @@ const Goal = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+        return;
+      }
       const data = await response.json();
       // console.log(data);
-      
+
       // Formater les dates et trier les objectifs ici
       const formattedGoals = data.map((goal) => ({
         ...goal,
@@ -70,7 +81,7 @@ const Goal = () => {
         : [];
       setGoals(sortedGoals);
     } catch (error) {
-      console.log("Fetch goals error:", error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -116,12 +127,12 @@ const Goal = () => {
               style={styles.card}
               onPress={() =>
                 navigation.navigate("ShowGoal", { goalId: goal._id })
-              } // Navigation ici
+              }
             >
               <View style={styles.row}>
                 <View style={styles.textContainer}>
                   <Text style={styles.goalName}>
-                    {"Objectif --> " + goal.name}
+                    {goal.name}
                   </Text>
                   <View style={styles.separator} />
                   <Text style={styles.goalAmount}>

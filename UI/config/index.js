@@ -1,5 +1,5 @@
-const BASE_URL = 'https://track-finances.onrender.com';
-// const BASE_URL = 'http://192.168.110.140:5000';
+// const BASE_URL = 'https://track-finances.onrender.com';
+const BASE_URL = 'http://192.168.114.140:5000';
 
 
 export const API_URL = {
@@ -9,9 +9,13 @@ export const API_URL = {
 
     createCategory: `${BASE_URL}/api/auth/user/category`,
     getCategories: `${BASE_URL}/api/auth/user/categories`,
+    showCategory: `${BASE_URL}/api/auth/user/categories/show`,
+    deleteMyCategory: `${BASE_URL}/api/auth/user/category/delete/:id`,
 
     AddBudget: `${BASE_URL}/api/auth/budget/create`,
     getBudget: `${BASE_URL}/api/auth/budget/all`,
+    getBudgetById: `${BASE_URL}/api/auth/budget/show-budget`,
+    deleteMyBudget: `${BASE_URL}/api/auth/budget/delete/:id`,
     
     getTransactions: `${BASE_URL}/api/auth/transactions`,
     createTransaction: `${BASE_URL}/api/auth/transaction`,
@@ -29,4 +33,5 @@ export const API_URL = {
     createGoal: `${BASE_URL}/api/auth/goals/my-goal`,
     showGoal: `${BASE_URL}/api/auth/goals/show-goal`,
     saveForGoal: `${BASE_URL}/api/auth/goals/my-goal/saving/:id`,
+    deleteMyGoal: `${BASE_URL}/api/auth/goals/my-goal/:id`,
 };

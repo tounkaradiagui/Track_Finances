@@ -4,9 +4,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/banking.png",
+
     "splash": {
       "image": "./assets/images/balance.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "extra": {
@@ -18,7 +19,7 @@
     "slug": "fund-wise",
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/checking.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.diaguitounkara.fundwise"
@@ -28,7 +29,7 @@
       "bundleIdentifier": "com.diaguitounkara.fundwise"
     },
     "web": {
-      "favicon": "./assets/images/welcome/Revenue-bro.png"
+      "favicon": "./assets/images/money_motivation.png"
     }
   }
 }

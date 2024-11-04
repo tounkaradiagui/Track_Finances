@@ -52,7 +52,7 @@ const Budget = () => {
       const data = await response.json();
       setBudget(data.budget || []);
     } catch (err) {
-      console.log(error);
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ const Budget = () => {
     const amount = Number(item.amount) || 0;
 
     return (
-      <View style={styles.card}>
+      <TouchableOpacity style={styles.card} key={item._id} onPress={() => navigation.navigate("BudgetDetails", {budgetId: item._id, categories })}>
         <View style={styles.iconContainer}>
           <FontAwesome name={item.icon || "money"} size={24} color="#fff" />
         </View>
@@ -108,7 +108,7 @@ const Budget = () => {
             {amount > 0 ? `${amount} Franc AES` : "0 Franc AES"}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

@@ -30,7 +30,7 @@ const AddTransaction = () => {
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
-  
+
       const numericAmount = Number(amount);
       if (numericAmount <= 0) {
         Toast.show({
@@ -42,7 +42,7 @@ const AddTransaction = () => {
         });
         return;
       }
-  
+
       const response = await fetch(API_URL.createTransaction, {
         method: "POST",
         headers: {
@@ -57,7 +57,7 @@ const AddTransaction = () => {
           description: description,
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         Toast.show({
@@ -69,15 +69,15 @@ const AddTransaction = () => {
         });
         return;
       }
-  
+
       setType("");
       setAmount("");
       setCategoryId("");
       setBudgetId("");
       setDescription("");
-      
+
       // Rafraîchir les budgets
-      await fetchBudgets(); 
+      await fetchBudgets();
 
       navigation.goBack("Transaction");
       Toast.show({
@@ -99,7 +99,6 @@ const AddTransaction = () => {
       setLoading(false);
     }
   };
-  
 
   const fetchCategories = async () => {
     try {
@@ -112,29 +111,21 @@ const AddTransaction = () => {
         },
       });
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
       const data = await response.json();
-      setCategories(data.categories); 
+      setCategories(data.categories);
       // Stocker les données dans l'état
       // console.log("Catégories récupérées:", data);
     } catch (error) {
-        Toast.show({
-          text1: "Erreur",
-          text2: error.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
+      Toast.show({
+        text1: "Erreur",
+        text2: error.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
       // console.error("Erreur lors de la récupération des catégories:", error);
     }
   };
@@ -152,30 +143,22 @@ const AddTransaction = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
-  
+
       const data = await response.json();
       // console.log("Budgets récupérés:", data.budget); // Log pour débogage
       setBudgets(data.budget || []);
     } catch (err) {
-        Toast.show({
-          text1: "Erreur",
-          text2: err.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
+      Toast.show({
+        text1: "Erreur",
+        text2: err.message,
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
       // console.error("Erreur lors de la récupération des budgets:", err);
       // setError(err.message);
     } finally {

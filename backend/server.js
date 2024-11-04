@@ -39,11 +39,11 @@ app.use('/api/auth/goals', goalRoutes);
 app.all('*',(req, res) => {
     res.status(404)
     if(req.accepts('html')) {
-        res.sendFile(path.join(__dirname, 'views' ,'404.html'))
+        res.sendFile(path.join(__dirname, 'views' ,'customPage.html'))
     } else if (req.accepts('json')){
-        res.json({message: 'Page non disponible'})
+        res.json({message: 'Le Backend est Prêt'})
     } else {
-        res.type('txt').send('Page non disponible')
+        res.type('txt').send('Le Backend est Prêt')
     }
 });
 

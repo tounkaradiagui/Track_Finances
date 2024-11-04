@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
-const generateSecretKey = require('../utils/generateToken.js')
+const { setCookie } = require("../utils/generateToken.js");
 
 const Register = async (req, res) => {
   try {
@@ -45,6 +45,14 @@ const Register = async (req, res) => {
     });
 
     await newUser.save();
+    // Générer un token JWT pour l'utilisateur
+    setCookie(res, newUser._id);
+
+    res.status(200).json({
+      message:
+        "Félicitations ! Votre compte a été créer avec succès, connectez-vous",
+        newUser,
+    });
 
     // Configuration de l'e-mail
     const transporter = nodemailer.createTransport({
@@ -121,8 +129,7 @@ const Register = async (req, res) => {
                 </ul>
 
               <h2>L'importance de notre application</h2>
-                <p>Aimport { generateSecretKey } from './../utils/generateToken';
-vec FundWise, vous pouvez prendre des décisions financières éclairées et planifier efficacement vos objectifs.</p>
+Avec FundWise, vous pouvez prendre des décisions financières éclairées et planifier efficacement vos objectifs.</p>
 
                 <h2>Prêt à commencer ?</h2>
                 <p>Connectez-vous à votre compte et explorez toutes les fonctionnalités. Si vous avez des questions, contactez notre support contact@fundWise.com.</p>
@@ -141,25 +148,11 @@ vec FundWise, vous pouvez prendre des décisions financières éclairées et pla
     // Envoi de l'e-mail
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({
-      message:
-        "Félicitations ! Votre compte a été créer avec succès, connectez-vous",
-      newUser,
-    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur de server" });
   }
 };
-
-// Generate a secret key
-const generateSecretKey = () => {
-  const secret = crypto.randomBytes(32).toString("hex");
-  return secret;
-};
-
-// Create a secret key
-export const secretKey = generateSecretKey();
 
 const Login = async (req, res) => {
   try {
@@ -187,29 +180,15 @@ const Login = async (req, res) => {
       return res.status(400).json({ message: "Mot de passe incorrect" });
     }
 
-    // const token = jwt.sign({userId: user._id,}, secretKey, {expiresIn: "7d"});
-    // res.cookie("Authorization", "Bearer " + token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    //   maxAge: 7 * 24 * 60 * 60 * 1000,
-    // });
+    const token = setCookie(res, user._id);
 
-    generateSecretKey(res, user._id);
+    // Exclure le mot de passe de la réponse
+    const { password: _, confirmPassword, ...userData } = user.toObject();
 
     res.status(200).json({
       message: "Vous êtes connecté",
-      // token,
-      generateSecretKey,
-      user: {
-        _id: user._id,
-        email: user.email,
-        nom: user.nom,
-        prenom: user.prenom,
-        lastLogin: user.lastLogin,
-        avatar:user.avatar,
-        userType:user.userType
-      },
+      token,
+      user: userData,
     });
   } catch (error) {
     console.log("Error : ", error);
@@ -681,7 +660,6 @@ module.exports = {
   UpdateUserProfile,
   DeleteUserAccount,
   ForgotPassword,
-  secretKey,
   Logout,
   ChangePassword,
   ResetPassword,

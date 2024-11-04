@@ -41,6 +41,14 @@ const Categories = () => {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -65,9 +73,6 @@ const Categories = () => {
     }, [])
   );
 
-  const handleViewDetails = (categoryId) => {
-    navigation.navigate("CategoryDetails", { categoryId });
-  };
 
   const renderCategoryItem = (category) => {
     const formattedDate = new Date(category.createdAt).toLocaleDateString();
@@ -76,7 +81,7 @@ const Categories = () => {
       <View key={category._id} style={styles.categoryCard}>
         <Text style={styles.categoryName}>{category.name}</Text>
         <Text style={styles.categoryDate}>{formattedDate}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => handleViewDetails(category._id)}>
+        <TouchableOpacity style={styles.button}  key={category._id} onPress={() => navigation.navigate("CategoryDetails", {categoryId:category._id})}>
           <Text style={styles.buttonText}>Consulter</Text>
         </TouchableOpacity>
       </View>

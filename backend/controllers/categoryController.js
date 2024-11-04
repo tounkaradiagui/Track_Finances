@@ -110,5 +110,20 @@ const deleteCategory = async (req, res) => {
     }
 };
 
+const showCategory = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const category = await Category.findById(id);
+        if (!category) {
+            return res.status(404).json({ message: "Catégorie non trouvée" });
+        }
+        res.status(200).json(category);
 
-module.exports = {getCategories, addCategory, updateCategory, deleteCategory}        
+    } catch (error) {
+        console.log("Erreur : ", error);
+        res.status(500).json({ message: "Erreur lors de la récupération de la catégorie"});        
+    }
+}
+
+
+module.exports = {getCategories, addCategory, updateCategory, deleteCategory, showCategory}        

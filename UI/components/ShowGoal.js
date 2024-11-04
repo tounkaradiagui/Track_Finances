@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
@@ -107,6 +108,64 @@ const ShowGoal = ({ route }) => {
     }
   };
 
+  const handleDelete = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    
+    try {
+      const response = await fetch(`${API_URL.deleteMyGoal.replace(":id", goalId)}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json(); // Await here to correctly parse the response
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message || "Une erreur est survenue", // Fallback error message
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
+        return;
+      }
+  
+      // Await for the successful response data
+      await response.json(); 
+      Toast.show({
+        type: "success",
+        text1: "Succès !",
+        text2: "Épargne supprimée avec succès !",
+        position: "top",
+        visibilityTime: 5000,
+      });
+      navigation.goBack("Goal");
+    } catch (error) {
+      console.log("Error deleting goal:", error);
+      Toast.show({
+        text1: "Erreur",
+        text2: "Une erreur est survenue lors de la suppression",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
+    }
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cet objectif ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Confirmer', onPress: handleDelete },
+      ]
+    );
+  };
+  
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -131,6 +190,9 @@ const ShowGoal = ({ route }) => {
         <Text style={styles.detail}>Montant ciblé: {goal.targetAmount}</Text>
         <Text style={styles.detail}>Date limite: {formatDate(goal.deadline)}</Text>
         <Text style={styles.detail}>Fréquence d'épargne: {goal.frequency}</Text>
+        <TouchableOpacity onPress={confirmDelete} style={styles.deleteButton}>
+        <Text style={styles.buttonText}>Supprimer</Text>
+      </TouchableOpacity>
       </View>
 
       <Text style={styles.savingMessage}>
@@ -190,6 +252,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#078ECB",
     borderRadius: 5,
     padding: 10,
+    alignItems: "center",
+  },
+
+  deleteButton: {
+    backgroundColor: "#ff0000",
+    borderRadius: 5,
+    padding: 10,
+    marginTop:20,
     alignItems: "center",
   },
   buttonText: {

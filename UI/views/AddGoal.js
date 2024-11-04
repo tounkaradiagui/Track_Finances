@@ -27,7 +27,7 @@ const AddGoal = () => {
       setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
       const userId = await AsyncStorage.getItem("userId");
-
+    
       const numericTargetAmount = Number(targetAmount);
       if (numericTargetAmount <= 0) {
         Toast.show({

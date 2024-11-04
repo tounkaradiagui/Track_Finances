@@ -183,10 +183,10 @@ const AddBudget = () => {
           onValueChange={(itemValue) => setPeriod(itemValue)}
           style={{ height: 50 }}
         >
-          <Picker.Item label="Mensuel" value="mensuel" />
-          <Picker.Item label="Trimestriel" value="trimestriel" />
-          <Picker.Item label="Semestriel" value="semestriel" />
-          <Picker.Item label="Annuel" value="annuel" />
+          <Picker.Item label="Mensuel" value="Mensuel" />
+          <Picker.Item label="Trimestriel" value="Trimestriel" />
+          <Picker.Item label="Semestriel" value="Semestriel" />
+          <Picker.Item label="Annuel" value="Annuel" />
         </Picker>
       </View>
 

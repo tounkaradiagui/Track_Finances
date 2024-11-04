@@ -23,8 +23,6 @@ import NetInfo from "@react-native-community/netinfo";
 import Toast from "react-native-toast-message";
 
 const Login = () => {
-  // const APP_URL = process.env.APP_URL;
-  // PORT = process.env.PORT;
   const { setUser } = useUser();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +43,7 @@ const Login = () => {
   };
 
   const isValidPassword = (password) => {
-    return password.length >= 4; // Exemple : mot de passe doit avoir au moins 4 caractères
+    return password.length >= 4; // le mot de passe doit avoir au moins 4 caractères
   };
 
   const handleLogin = async () => {
@@ -156,6 +154,13 @@ const Login = () => {
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem("userId", data.user._id);
         // console.log("ID utilisateur stocké :", data.user._id);
+
+        // Définir l'expiration du token (15 secondes)
+        // const expirationTime = new Date().getTime() + (15 * 1000);
+
+        // Définir l'expiration du token (7 jours)
+        const expirationTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+        await AsyncStorage.setItem("tokenExpiration", expirationTime.toString());
         
         // Stocker les informations utilisateur
         const userInfos = {
@@ -184,9 +189,7 @@ const Login = () => {
     } finally {
         setLoading(false);
     }
-};
-
-
+  };
 
   return (
     <SafeAreaView>
@@ -279,7 +282,7 @@ const Login = () => {
 
                 <MaterialCommunityIcons
                   onPress={togglePasswordVisibility}
-                  name={showPassword ? "eye" : "eye-off"}
+                  name={showPassword ? "eye-off" : "eye"}
                   size={24}
                   color="black"
                   marginRight={5}

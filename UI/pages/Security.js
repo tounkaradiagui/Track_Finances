@@ -32,9 +32,7 @@ const Security = () => {
       });
 
       if (response.ok) {
-        await AsyncStorage.removeItem('authToken');
-        await AsyncStorage.removeItem('userId');
-        await AsyncStorage.removeItem('userInfo');
+        await AsyncStorage.multiRemove(["authToken", "userId", "UserInfo", "tokenExpiration"]);
         setUser(null);
         Toast.show({
           type: "success",

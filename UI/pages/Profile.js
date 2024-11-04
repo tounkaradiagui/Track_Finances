@@ -5,8 +5,8 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Switch,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,14 +17,11 @@ import { useUser } from "../UserContext";
 
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { useTheme } from "../context/ThemeContext";
 import { useCallback, useEffect, useState } from "react";
-import { API_URL } from "../config";
 import Toast from "react-native-toast-message";
 
 const Profile = () => {
   const { user, setUser } = useUser();
-  const { darkModeEnabled } = useTheme();
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -54,22 +51,49 @@ const Profile = () => {
     return `${formattedDate} à ${hours}:${minutes}`;
   };
 
-  const handleLogout = () => {
-    clearAuthToken();
+  const handleLogout = async () => {
+    try {
+      await clearAuthToken();
+    } catch (error) {
+      console.error("Error during logout:", error);
+      Toast.show({
+        type: "error",
+        text1: "Erreur",
+        text2: "Une erreur est survenue lors de la déconnexion.",
+        position: "top",
+        visibilityTime: 5000,
+      });
+    }
   };
 
   const clearAuthToken = async () => {
-    await AsyncStorage.removeItem("authToken");
-    // console.log("Token removed");
+    await AsyncStorage.multiRemove([
+      "authToken",
+      "userId",
+      "UserInfo",
+      "tokenExpiration",
+    ]);
+    // console.log("Tokens removed");
     setUser(null);
     navigation.navigate("PublicScreen", { screen: "Login" });
     Toast.show({
       type: "success",
-      text1: "Féliciations !!",
-      text2: "Vous êtes deconnecté !",
+      text1: "Félicitations !!",
+      text2: "Vous êtes déconnecté !",
       position: "top",
       visibilityTime: 5000,
     });
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Confirmer la déconnexion",
+      "Êtes-vous sûr de vouloir vous déconnecter ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        { text: "Déconnecter", onPress: handleLogout },
+      ]
+    );
   };
 
   const fetchUserInfo = async () => {
@@ -102,10 +126,7 @@ const Profile = () => {
 
   return (
     <ScrollView
-      style={[
-        styles.container,
-        darkModeEnabled ? styles.darkContainer : styles.lightContainer,
-      ]}
+      style={[styles.container]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -155,12 +176,7 @@ const Profile = () => {
               {user.email}
             </Text>
 
-            <Text
-              style={[
-                styles.text,
-                darkModeEnabled ? styles.darkText : styles.lightText,
-              ]}
-            >
+            <Text style={[styles.text]}>
               Dernière connexion : {formatDate(user.lastLogin)}
             </Text>
           </View>
@@ -219,7 +235,7 @@ const Profile = () => {
         </TouchableOpacity>
 
         {/* Déconnexion */}
-        <TouchableOpacity style={styles.option} onPress={handleLogout}>
+        <TouchableOpacity style={styles.option} onPress={confirmDelete}>
           <SimpleLineIcons
             name="logout"
             size={24}

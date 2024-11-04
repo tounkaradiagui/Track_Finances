@@ -7,7 +7,6 @@ import Categories from '../pages/Categories';
 import Budget from '../pages/Budget';
 import Profile from '../pages/Profile';
 import CreateCategory from '../views/CreateCategory';
-import Target from '../views/Target';
 import AddTransaction from '../views/AddTransaction';
 import AddBudget from '../views/AddBudget';
 import Settings from '../pages/Settings';
@@ -17,10 +16,11 @@ import Security from '../pages/Security';
 import ChangePassword from './ChangePassword';
 import TransactionDetails from '../views/TransactionDetails';
 import Goal from '../pages/Goal';
-import GoalProgress from './GoalProgress';
 import AddGoal from '../views/AddGoal';
 import Savings from '../pages/Savings';
 import ShowGoal from './ShowGoal';
+import CategoryDetails from './CategoryDetails';
+import BudgetDetails from './BudgetDetails';
 
 const ProtectedData = () => {
     const Stack = createNativeStackNavigator();
@@ -42,10 +42,9 @@ const ProtectedData = () => {
             <Stack.Screen name="Savings" component={Savings} options={{ title: 'Epargne'}}/>
             <Stack.Screen name="ShowGoal" component={ShowGoal} options={{ title: 'Ajouter un épargne'}}/>
             
-            <Stack.Screen name="GoalProgress" component={GoalProgress} options={{ title: 'Ma Progression'}}/>
-
             {/* Manage categories */}
             <Stack.Screen name="CreateCategory" component={CreateCategory} options={{ title: 'Catégorie'}}/>
+            <Stack.Screen name="CategoryDetails" component={CategoryDetails} options={{ title: 'Détails'}}/>
 
             {/* Manage transactions */}
             <Stack.Screen name="AddTransaction" component={AddTransaction} options={{ title: 'Transaction'}}/>
@@ -53,10 +52,9 @@ const ProtectedData = () => {
 
             {/* Manage budgets */}
             <Stack.Screen name="AddBudget" component={AddBudget} options={{ title: 'Ajouter un Budget'}}/>
+            <Stack.Screen name="BudgetDetails" component={BudgetDetails} options={{ title: 'Détails Budget'}}/>
 
             {/* Financial Goal / Target */}
-            <Stack.Screen name="Target" component={Target} options={{ title: 'Fixer un Objectif'}}/>
-
         </Stack.Navigator>
     );
 };

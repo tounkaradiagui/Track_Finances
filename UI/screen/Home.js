@@ -19,6 +19,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../UserContext";
 import { API_URL } from "../config";
+import Toast from "react-native-toast-message";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -73,6 +74,14 @@ const Home = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          text1: "Erreur",
+          text2: errorData.message,
+          type: "error",
+          position: "top",
+          visibilityTime: 3000,
+        });
         return;
       }
 
@@ -98,6 +107,11 @@ const Home = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      // Vérifiez si la réponse est correcte
+      if (!response.ok) {
+        return;
+      }
       const data = await response.json();
       // console.log(data);
 
@@ -115,7 +129,7 @@ const Home = () => {
         : [];
       setGoals(sortedGoals);
     } catch (error) {
-      console.log("Fetch goals error:", error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -132,7 +146,7 @@ const Home = () => {
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
-      <StatusBar backgroundColor="#078ECB" style="light" />
+        <StatusBar backgroundColor="#078ECB" style="light" />
         <View>
           <View style={styles.headerTop}>
             <Text style={styles.salutation}>{getGreeting()},</Text>
