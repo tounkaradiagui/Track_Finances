@@ -1,5 +1,6 @@
 const Transaction = require('../models/Transaction')
 const Budget = require('../models/Budget');
+const { default: mongoose } = require('mongoose');
 
 const createTransaction = async (req, res) => {
     try {
@@ -74,7 +75,6 @@ const createTransaction = async (req, res) => {
     }
 };
 
-
 const getTransactions = async (req, res) => {
     try {
         // Vérifier que l'utilisateur est connecté
@@ -95,6 +95,19 @@ const getTransactions = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la récupération des transactions." });
     }
 };
+
+const getTransactionById = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const transaction = await Transaction.findById(id);
+        if(!transaction) {
+            return res.status(404).json({message: 'Transaction non trouvée.'});
+        }
+        res.status(200).json({message: "Transaction trouvée", transaction});
+    } catch (error) {
+        console.log("Erreur : ", error);
+    }
+}
 
 const updateTransaction = async (req, res) => {
     try {
@@ -145,4 +158,4 @@ const deleteTransaction = async (req, res) => {
     }
 };
 
-module.exports = {getTransactions, createTransaction, updateTransaction, deleteTransaction}
+module.exports = {getTransactions, createTransaction, updateTransaction, deleteTransaction, getTransactionById}
