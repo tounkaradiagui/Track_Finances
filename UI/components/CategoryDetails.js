@@ -6,7 +6,7 @@ import { API_URL } from "../config";
 import Toast from "react-native-toast-message";
 
 const CategoryDetails = ({ route }) => {
-  const { categoryId } = route.params;
+  const { categoryId, removeCategory } = route.params;
   const navigation = useNavigation();
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -78,6 +78,9 @@ const CategoryDetails = ({ route }) => {
         position: "top",
         visibilityTime: 5000,
       });
+
+      removeCategory(categoryId);
+      
       navigation.goBack("Categories");
     } catch (error) {
       console.log("Error deleting goal:", error);

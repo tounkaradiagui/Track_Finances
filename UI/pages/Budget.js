@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -13,6 +14,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { API_URL } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { COLORS } from "../constants";
 
 const Budget = () => {
   const [budget, setBudget] = useState([]);
@@ -122,6 +124,7 @@ const Budget = () => {
       </View>
       {loading ? (
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       ) : budget.length === 0 ? (

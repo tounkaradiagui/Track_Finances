@@ -38,16 +38,6 @@ const ShowGoal = ({ route }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        // console.error("Error response:", errorData);
-        Toast.show({
-          text1: "Erreur",
-          text2:
-            errorData.message || "Erreur lors de la récupération de l'objectif",
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
@@ -68,6 +58,16 @@ const ShowGoal = ({ route }) => {
 
   const handleSave = async () => {
     const token = await AsyncStorage.getItem("authToken");
+    if(!savingAmount) {
+      Toast.show({
+        text1: "Erreur",
+        text2: "Veuillez saisir une valeur pour le montant à économiser",
+        type: "error",
+        position: "top",
+        visibilityTime: 3000,
+      });
+      return;
+    }
     try {
       const response = await fetch(
         `${API_URL.saveForGoal.replace(":id", goalId)}`,

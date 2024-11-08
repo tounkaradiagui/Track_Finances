@@ -17,12 +17,12 @@ import NetInfo from "@react-native-community/netinfo";
 import Toast from "react-native-toast-message";
 
 const Register = () => {
-  const [isSelected, setSelection] = useState(false);
+  // const [isSelected, setSelection] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleCheckedboxChange = () => {
-    setSelection(!isSelected);
-  };
+  // const handleCheckedboxChange = () => {
+  //   setSelection(!isSelected);
+  // };
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -96,7 +96,7 @@ const Register = () => {
       return;
     }
 
-    // Validation du email
+    // Vérification de l'email
     if (!email) {
       Toast.show({
         text1: "Erreur",
@@ -396,7 +396,7 @@ const Register = () => {
 
               <MaterialCommunityIcons
                 onPress={togglePasswordVisibility}
-                name={showPassword ? "eye" : "eye-off"}
+                name={showPassword ? "eye-off" : "eye"}
                 size={24}
                 color="black"
                 marginRight={5}
@@ -440,7 +440,7 @@ const Register = () => {
 
               <MaterialCommunityIcons
                 onPress={toggleConfirmPasswordVisibility}
-                name={showConfirmPassword ? "eye" : "eye-off"}
+                name={showConfirmPassword ? "eye-off" : "eye"}
                 size={24}
                 color="black"
                 marginRight={5}

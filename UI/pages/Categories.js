@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +21,12 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const removeCategory = (deletedCategoryId) => {
+    setCategories((prevCategories) =>
+      prevCategories.filter((categories) => categories._id !== deletedCategoryId)
+    );
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -41,14 +48,6 @@ const Categories = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
@@ -81,7 +80,7 @@ const Categories = () => {
       <View key={category._id} style={styles.categoryCard}>
         <Text style={styles.categoryName}>{category.name}</Text>
         <Text style={styles.categoryDate}>{formattedDate}</Text>
-        <TouchableOpacity style={styles.button}  key={category._id} onPress={() => navigation.navigate("CategoryDetails", {categoryId:category._id})}>
+        <TouchableOpacity style={styles.button}  key={category._id} onPress={() => navigation.navigate("CategoryDetails", {categoryId:category._id, removeCategory})}>
           <Text style={styles.buttonText}>Consulter</Text>
         </TouchableOpacity>
       </View>
@@ -98,6 +97,7 @@ const Categories = () => {
       </View>
       {loading ? (
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       ) : categories.length === 0 ? (

@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   RefreshControl,
   ScrollView,
@@ -22,6 +23,11 @@ const Transaction = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const removeTransaction = (deletedTransactionId) => {
+    setTransactions((prevTransactions) =>
+      prevTransactions.filter((transaction) => transaction._id !== deletedTransactionId)
+    );
+  };
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -45,14 +51,6 @@ const Transaction = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
@@ -127,7 +125,8 @@ const Transaction = () => {
         <Text style={styles.transactionDescription}>{categoryName}</Text>
         <Text style={styles.transactionDate}>{formatDate(item.createdAt)}</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("TransactionDetails", { transaction: item })}
+          key={item._id}
+          onPress={() => navigation.navigate("TransactionDetails", { transactionId: item._id, categories, removeTransaction })}
           style={styles.detailsButton}
         >
           <Text style={styles.detailsButtonText}>Consulter</Text>
@@ -146,6 +145,7 @@ const Transaction = () => {
         </View>
         {loading ? (
           <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
             <Text style={styles.loadingText}>Chargement...</Text>
           </View>
         ) : transactions.length === 0 ? (

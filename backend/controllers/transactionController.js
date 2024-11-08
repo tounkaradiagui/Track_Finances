@@ -1,6 +1,6 @@
 const Transaction = require('../models/Transaction')
 const Budget = require('../models/Budget');
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
 const createTransaction = async (req, res) => {
     try {
@@ -97,17 +97,34 @@ const getTransactions = async (req, res) => {
 };
 
 const getTransactionById = async (req, res) => {
-    const {id} = req.params;
-    try {
-        const transaction = await Transaction.findById(id);
-        if(!transaction) {
-            return res.status(404).json({message: 'Transaction non trouvée.'});
-        }
-        res.status(200).json({message: "Transaction trouvée", transaction});
-    } catch (error) {
-        console.log("Erreur : ", error);
+    const { id } = req.params;
+
+    // Vérification de la validité de l'ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "ID de transaction invalide." });
     }
-}
+
+    try {
+        // Recherche de la transaction dans la base de données
+        const transaction = await Transaction.findById(id);
+
+        // Si la transaction n'existe pas, retour d'une erreur 404
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction non trouvée." });
+        }
+
+        // Réponse avec la transaction trouvée
+        return res.status(200).json({
+            message: "Transaction trouvée.",
+            transaction
+        });
+
+    } catch (error) {
+        // Gestion des erreurs et envoi d'une réponse appropriée
+        console.log("Erreur lors de la récupération de la transaction : ", error);
+        return res.status(500).json({ message: "Une erreur est survenue lors de la récupération de la transaction." });
+    }
+};
 
 const updateTransaction = async (req, res) => {
     try {
@@ -146,7 +163,7 @@ const deleteTransaction = async (req, res) => {
             res.status(200).json({message: "Accès refusé. Vous devez etre connecté"});
         }
         // Trouver la transaction par ID et s'assurer qu'elle appartient à l'utilisateur connecté
-    const transaction = await Transaction.findOneAndDelete({_id: transactionId, userId: req.user.userId});
+        const transaction = await Transaction.findOneAndDelete({_id: transactionId, userId: req.user.userId});
         if(!transaction) {
             return res.status(404).json({message: "Transaction non trouvée ou n'avez pas les droits pour la supprimer."});
         }

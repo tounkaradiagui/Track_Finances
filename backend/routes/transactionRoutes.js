@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/transaction', authMiddleware, createTransaction);
 router.get('/transactions', authMiddleware, getTransactions);
-router.get('/transaction/show/:transactionId', authMiddleware, getTransactionById);
+router.get('/transaction/show/:id', authMiddleware, getTransactionById);
 router.put('/transaction/:transactionId', authMiddleware, updateTransaction);
 router.delete('/transaction/:transactionId', authMiddleware, deleteTransaction);
 

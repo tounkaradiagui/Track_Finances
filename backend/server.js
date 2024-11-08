@@ -35,21 +35,22 @@ app.use('/api/auth', transactionRoutes);
 app.use('/api/auth/budget', budgetRoutes);
 app.use('/api/auth/goals', goalRoutes);
 
-//Pour les requetes des page inexistantes, renvoie la view suivante
-app.all('*',(req, res) => {
-    res.status(404)
-    if(req.accepts('html')) {
-        res.sendFile(path.join(__dirname, 'views' ,'customPage.html'))
-    } else if (req.accepts('json')){
-        res.json({message: 'Le Backend est Prêt'})
-    } else {
-        res.type('txt').send('Le Backend est Prêt')
-    }
+
+// Route pour la page d'accueil ("/")
+app.get('/', (req, res) => {
+    res.send('Le backend est prêt');
 });
 
-// Custom message if backend work as expected
-app.get('/', (req, res) => {
-    res.send('Le Backend est Prêt');
+// Gérer toutes les autres requêtes avec une erreur 404
+app.all('*', (req, res) => {
+    res.status(404);
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'));
+    } else if (req.accepts('json')) {
+        res.json({ message: 'Page introuvable' });
+    } else {
+        res.type('txt').send('Page introuvable');
+    }
 });
 
 // Connexion à la base de données

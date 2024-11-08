@@ -45,14 +45,12 @@ const Register = async (req, res) => {
     });
 
     await newUser.save();
-    // Générer un token JWT pour l'utilisateur
-    setCookie(res, newUser._id);
-
     res.status(200).json({
       message:
         "Félicitations ! Votre compte a été créer avec succès, connectez-vous",
         newUser,
     });
+    
 
     // Configuration de l'e-mail
     const transporter = nodemailer.createTransport({

@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import { API_URL } from "../config";
 import * as Progress from "react-native-progress";
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { COLORS } from "../constants";
 
 const Goal = () => {
   const [goals, setGoals] = useState([]);
@@ -111,6 +113,7 @@ const Goal = () => {
       </View>
       {loading ? (
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       ) : goals.length === 0 ? (

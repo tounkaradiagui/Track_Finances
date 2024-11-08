@@ -44,9 +44,10 @@ const Home = () => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-    return date.toLocaleDateString("fr-FR", options); // Format français
+    return date.toLocaleDateString("fr-FR", options); // Format de la date en français
   };
 
+  // Récuperer les informations d'utilisateur
   const fetchUserInfo = async () => {
     try {
       const storedUserInfo = await AsyncStorage.getItem("userInfo");
@@ -61,6 +62,7 @@ const Home = () => {
     }
   };
 
+  // Trouver les transactions
   const fetchTransactions = async () => {
     setLoading(true);
     try {
@@ -74,14 +76,6 @@ const Home = () => {
 
       // Vérifiez si la réponse est correcte
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
@@ -95,6 +89,7 @@ const Home = () => {
     }
   };
 
+  // Trouver les objectifs financiers
   const fetchGoals = async () => {
     setLoading(true);
     try {
@@ -135,6 +130,7 @@ const Home = () => {
     }
   };
 
+  // Actualiser la page à chaque focus ie, retourner les données en temps réel lorsque l'utilisateur navigue d'une page à l'autre.
   useFocusEffect(
     useCallback(() => {
       fetchUserInfo();
@@ -285,7 +281,6 @@ const Home = () => {
             )}
           </View>
 
-          {/* Objectif financiers */}
           {/* Objectif financiers */}
           <View
             style={{
