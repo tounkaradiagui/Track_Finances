@@ -11,19 +11,17 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useUser } from "../UserContext";
-
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
+import { API_URL } from "../config";
 
 const Profile = () => {
   const { user, setUser } = useUser();
   const navigation = useNavigation();
-
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
@@ -32,10 +30,6 @@ const Profile = () => {
       setRefreshing(false);
     }, 2000);
   }, []);
-
-  if (!user) {
-    return <Text>Chargement...</Text>;
-  }
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -70,10 +64,9 @@ const Profile = () => {
     await AsyncStorage.multiRemove([
       "authToken",
       "userId",
-      "UserInfo",
+      "userInfo",
       "tokenExpiration",
     ]);
-    // console.log("Tokens removed");
     setUser(null);
     navigation.navigate("PublicScreen", { screen: "Login" });
     Toast.show({
@@ -96,40 +89,15 @@ const Profile = () => {
     );
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const storedUserInfo = await AsyncStorage.getItem("userInfo");
-      if (storedUserInfo) {
-        setUser(JSON.parse(storedUserInfo));
-      }
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des informations utilisateur :",
-        error
-      );
-    }
-  };
-
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     fetchUserInfo();
-  //   }, [])
-  // );
-
+  // Si l'utilisateur n'est pas encore défini (chargement des données)
   if (!user) {
-    return <Text>Chargement...</Text>; // Affichez un message de chargement
+    return <Text>Chargement...</Text>;
   }
 
   return (
     <ScrollView
       style={[styles.container]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <StatusBar backgroundColor="#078ECB" style="light" />
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -137,111 +105,49 @@ const Profile = () => {
           <TouchableOpacity>
             <View style={styles.ProfilePicture}>
               <Image
-                source={{
-                  uri:
-                    user.avatar ||
-                    "https://www.congres-detergence.com/images/intervenants/photo-avatar-profil.png",
-                }}
+                source={{ uri: user.avatar || "../assets/images/profile-picture.jpg" }}
                 style={styles.ProfilePicture}
               />
-              {/* <Image
-                source={require("../assets/images/profile-picture.jpg")}
-                style={styles.ProfilePicture}
-              /> */}
             </View>
             <View style={styles.FeatherIcon}>
               <FontAwesome name="camera" size={15} color="white" />
             </View>
           </TouchableOpacity>
-          <View
-            style={{
-              flexDirection: "column",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
+          <View style={{ flexDirection: "column" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center" }}>
               {user.prenom} {user.nom}
             </Text>
-            <Text
-              style={{
-                fontSize: 15,
-                textAlign: "center",
-              }}
-            >
-              {user.email}
-            </Text>
-
-            <Text style={[styles.text]}>
-              Dernière connexion : {formatDate(user.lastLogin)}
-            </Text>
+            <Text style={{ fontSize: 15, textAlign: "center" }}>{user.email}</Text>
+            <Text style={[styles.text]}>Dernière connexion : {formatDate(user.lastLogin)}</Text>
           </View>
         </View>
 
-        <View
-          style={{
-            paddingHorizontal: 20,
-            borderBottomWidth: 1,
-            borderBottomColor: "#078ECB",
-            marginHorizontal: 20,
-            marginTop: 10,
-          }}
-        ></View>
+        <View style={{ paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#078ECB", marginHorizontal: 20, marginTop: 10 }}></View>
 
         {/* Notifications */}
         <TouchableOpacity style={styles.option}>
-          <FontAwesome
-            name="bell"
-            size={24}
-            color="#078ECB"
-            style={styles.icon}
-          />
+          <FontAwesome name="bell" size={24} color="#078ECB" style={styles.icon} />
           <Text style={styles.optionText}>Notifications</Text>
           <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
         </TouchableOpacity>
 
         {/* Paramètres */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <MaterialIcons
-            name="settings"
-            size={24}
-            color="#078ECB"
-            style={styles.icon}
-          />
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("Settings")}>
+          <MaterialIcons name="settings" size={24} color="#078ECB" style={styles.icon} />
           <Text style={styles.optionText}>Paramètres</Text>
           <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
         </TouchableOpacity>
 
         {/* A Propos */}
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => navigation.navigate("About")}
-        >
-          <MaterialIcons
-            name="help"
-            size={24}
-            color="#078ECB"
-            style={styles.icon}
-          />
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate("About")}>
+          <MaterialIcons name="help" size={24} color="#078ECB" style={styles.icon} />
           <Text style={styles.optionText}>A Propos</Text>
           <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
         </TouchableOpacity>
 
         {/* Déconnexion */}
         <TouchableOpacity style={styles.option} onPress={confirmDelete}>
-          <SimpleLineIcons
-            name="logout"
-            size={24}
-            color="#078ECB"
-            style={styles.icon}
-          />
+          <SimpleLineIcons name="logout" size={24} color="#078ECB" style={styles.icon} />
           <Text style={styles.optionText}>Déconnexion</Text>
           <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
         </TouchableOpacity>
@@ -250,80 +156,19 @@ const Profile = () => {
   );
 };
 
-export default Profile;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    marginTop: 30,
-  },
-  profile: {
-    padding: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  ProfilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 230,
-  },
+  container: { flex: 1, backgroundColor: "#fff", marginTop: 30 },
+  profile: { padding: 24, alignItems: "center", justifyContent: "center", marginTop: 20 },
+  ProfilePicture: { width: 100, height: 100, borderRadius: 230 },
   FeatherIcon: {
-    width: 28,
-    height: 28,
-    backgroundColor: "#078ECB",
-    position: "absolute",
-    borderRadius: 30,
-    alignItems: "center",
-    right: -5,
-    bottom: 2,
-    paddingTop: 4,
+    width: 28, height: 28, backgroundColor: "#078ECB", position: "absolute", borderRadius: 30, alignItems: "center", right: -5, bottom: 2, paddingTop: 4,
   },
   option: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    marginHorizontal: 20,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: "#ccc", marginHorizontal: 20,
   },
-  icon: {
-    marginRight: 10,
-  },
-  optionText: {
-    fontSize: 18,
-    flex: 1,
-    marginLeft: 10,
-  },
-  header: {
-    paddingVertical: 10,
-    marginTop: 20,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  logout: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    marginTop: 20,
-  },
-  darkContainer: {
-    backgroundColor: "#333",
-  },
-  lightContainer: {
-    backgroundColor: "#fff",
-  },
-  text: {
-    fontSize: 18,
-  },
-  darkText: {
-    color: "#fff",
-  },
-  lightText: {
-    color: "#000",
-  },
+  icon: { marginRight: 10 },
+  optionText: { fontSize: 18, flex: 1, marginLeft: 10 },
+  text: { fontSize: 18 },
 });
+
+export default Profile;

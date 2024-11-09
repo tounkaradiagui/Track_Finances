@@ -20,9 +20,7 @@ const Budget = () => {
   const [budget, setBudget] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
-  const [error, setError] = useState(null);
-  
+  const navigation = useNavigation();  
 
   const fetchBudgets = async () => {
     try {
@@ -40,14 +38,6 @@ const Budget = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          text1: "Erreur",
-          text2: errorData.message,
-          type: "error",
-          position: "top",
-          visibilityTime: 3000,
-        });
         return;
       }
 
@@ -81,11 +71,6 @@ const Budget = () => {
       console.log(err);
     }
   };
-
-  // useEffect(() => {
-  //   fetchBudgets();
-  //   fetchCategories();
-  // }, []);
 
   useFocusEffect(
     useCallback(() => {

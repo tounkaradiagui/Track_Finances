@@ -5,6 +5,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
 const { setCookie } = require("../utils/generateToken.js");
+const multer = require("multer");
+const path = require("path");
 
 const Register = async (req, res) => {
   try {
@@ -194,45 +196,78 @@ const Login = async (req, res) => {
   }
 };
 
+// // Configuration de Multer pour le stockage des fichiers
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, 'uploads');
+    console.log("Dossier de destination:", uploadPath); // Log pour vérifier le chemin
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + path.extname(file.originalname); //Utilisation d'un nom unique pour éviter les collisions
+    console.log("Nom du fichier:", uniqueName); // Log pour vérifier le nom du fichier
+    cb(null, uniqueName);
+
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error("Seules les images JPEG, JPG, PNG sont autorisées"));
+    }
+  },
+}).single("avatar"); // On attend un fichier unique avec le nom "avatar"
+
 const UpdateUserProfile = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const { nom, prenom, email, avatar, userType } = req.body;
+    const { nom, prenom, email, userType } = req.body;
+    let avatar = req.file ? req.file.path : null; // touver le chemin du fichier si avatar est charger
 
-    // Vérifiez si userId est une chaîne valide avant de faire la requête
+    // Valider userId
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "ID utilisateur invalide" });
     }
 
-    // Vérifiez si l'email existe déjà
+    // Vérifier si l'email existe
     const existingUser = await User.findOne({ email });
     if (existingUser && existingUser._id.toString() !== userId) {
       return res.status(400).json({ message: "L'email est déjà utilisé par un autre utilisateur" });
     }
 
+    // Mettre à jour user profile
     const user = await User.findByIdAndUpdate(
       userId,
       { nom, prenom, email, avatar, userType },
-      { new: true }
+      { new: true } // Retourner les données mise à jour de user
     );
 
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    // Exclure le mot de passe et le type d'utilisateur de la réponse
+    // Exclure password et confirmPassword de la reponse
     const { password, confirmPassword, createdAt, ...userResponse } = user.toObject();
 
-    // Inclure updatedAt dans la réponse
+    // Ajouter updatedAt et lastLogin à la reponse
     userResponse.updatedAt = user.updatedAt;
     userResponse.lastLogin = user.lastLogin;
 
-    res
-      .status(200)
-      .json({ message: "Votre profil a été mis à jour", user: userResponse });
+    res.status(200).json({
+      message: "Votre profil a été mis à jour",
+      user: userResponse,
+    });
   } catch (error) {
     console.log("Erreur: ", error);
-    res.status(500).json({ message: "Erreur de server" });
+    res.status(500).json({ message: "Erreur du serveur" });
   }
 };
 
@@ -664,4 +699,5 @@ module.exports = {
   protectedData,
   getUserById,
   requestPasswordReset,
+  upload,
 };

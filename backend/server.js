@@ -35,6 +35,8 @@ app.use('/api/auth', transactionRoutes);
 app.use('/api/auth/budget', budgetRoutes);
 app.use('/api/auth/goals', goalRoutes);
 
+app.use('/uploads', express.static(path.join(__dirname, 'controllers/uploads')));
+
 
 // Route pour la page d'accueil ("/")
 app.get('/', (req, res) => {

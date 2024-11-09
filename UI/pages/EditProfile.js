@@ -33,8 +33,8 @@ const EditProfile = () => {
   // Fonction pour enregistrer les modifications
   const handleSave = async () => {
     const userId = await AsyncStorage.getItem("userId");
-
-    if (!prenom || !nom || !email) {
+  
+    if (!prenom || !nom) {
       Toast.show({
         type: "error",
         text1: "Erreur de validation",
@@ -44,74 +44,79 @@ const EditProfile = () => {
       });
       return;
     }
+  
     const userData = {
-      id: userId,
       prenom: prenom,
       nom: nom,
       email: email,
-      image: image,
     };
-
+  
     if (userId) {
       try {
         const formData = new FormData();
-        formData.append("file", {
-          uri: image,
-          name: "profile.jpg",
-          type: "image/jpeg",
-        });
-        formData.append("userData", JSON.stringify(userData));
+        if (image) {
+          formData.append("file", {
+            uri: image,
+            name: "profile.jpg",
+            type: "image/jpeg",
+          });
+        }
+  
+        formData.append("prenom", prenom);
+        formData.append("nom", nom);
+        formData.append("email", email);
+  
         const response = await fetch(`${API_URL.editUserProfile}/${userId}`, {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data", // Set multipart form data
           },
-          body: JSON.stringify(userData),
+          body: formData, // Send the formData
         });
-
+  
         if (!response.ok) {
           const errorData = await response.json();
           Toast.show({
-            type: "error",
             text1: "Erreur",
-            text2: errorData.message || "Veuillez réessayer plus tard",
+            text2: errorData.message,
+            type: "error",
             position: "top",
             visibilityTime: 3000,
           });
           return;
         }
-
+  
         const updatedUserData = await response.json();
-        // console.log("Données mises à jour :", updatedUserData);
-
-        // Mettez à jour le contexte et les états locaux
+  
+        // Ensure the image URL is valid
+        const imageUrl = updatedUserData.user.image
+          ? `${API_URL}/uploads/${updatedUserData.user.image}`
+          : updatedUserData.user.image;
+  
         setUser((prev) => ({
           ...prev,
           prenom: updatedUserData.user.prenom || prev.prenom,
           nom: updatedUserData.user.nom || prev.nom,
           email: updatedUserData.user.email || prev.email,
-          image: updatedUserData.user.image || prev.image,
+          image: imageUrl || prev.image,
         }));
-
-        // Mettre à jour les états locaux
+  
         setPrenom(updatedUserData.user.prenom || "");
         setNom(updatedUserData.user.nom || "");
         setEmail(updatedUserData.user.email || "");
         setImage(updatedUserData.user.image || "");
-
+  
         Toast.show({
           type: "success",
           text1: "Profil mis à jour avec succès",
-          text2:
-            "Vous pouvez maintenant vous connecter avec vos nouvelles infos",
+          text2: "Vous pouvez maintenant vous connecter avec vos nouvelles infos",
           position: "top",
           visibilityTime: 5000,
         });
-
-        await loadUserData(); // Assurez-vous que cela appelle la bonne URL
+  
         navigation.goBack("Profile");
       } catch (error) {
-        console.erlogror("Erreur :", error);
+        console.log("Erreur :", error);
         Toast.show({
           text1: "Erreur",
           text2: "Échec de la mise à jour. Veuillez réessayer.",
@@ -120,6 +125,8 @@ const EditProfile = () => {
       }
     }
   };
+  
+  
 
   const pickImage = async () => {
     const permissionResult =
@@ -206,10 +213,10 @@ const EditProfile = () => {
       <TouchableOpacity onPress={pickImage}>
         <View style={styles.ProfilePicture}>
           {image ? (
-            <Image source={{ uri: image }} style={styles.ProfilePicture} />
+            <Image source={{ uri: `${API_URL}/uploads/${image}` }} style={styles.ProfilePicture} />
           ) : (
             <Image
-              source={require("../assets/images/profile-picture.jpg")}
+              source={{uri: user.avatar }}
               style={styles.ProfilePicture}
             />
           )}
