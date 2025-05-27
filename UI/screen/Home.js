@@ -314,7 +314,7 @@ const Home = () => {
               </TouchableOpacity>
             </View>
           </View> */}
-          <View
+          {/* <View
             style={{
               paddingHorizontal: 15,
               padding: 10,
@@ -390,7 +390,7 @@ const Home = () => {
                 </View>
               ))
             )}
-          </View>
+          </View> */}
 
           {/* Epargne */}
         </View>
