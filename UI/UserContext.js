@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { isTokenExpired } from "./utils/auth"; // Cette fonction doit vérifier si le token est expiré
+import { isTokenExpired } from "./utils/auth"; 
+// import axios from './config/axios'
 
 export const UserContext = createContext();
 
@@ -28,6 +29,7 @@ export const UserProvider = ({ children }) => {
 
   // Fonction pour vérifier la validité du token et récupérer les informations utilisateur
   const checkTokenValidity = async () => {
+    // Cette fonction doit vérifier si le token est expiré
     const expired = await isTokenExpired();
     if (expired) {
       await handleLogout(); // Si le token est expiré, déconnecter l'utilisateur
@@ -49,6 +51,14 @@ export const UserProvider = ({ children }) => {
 
       // Si toutes les informations sont présentes dans AsyncStorage, on met à jour l'état utilisateur
       if (storedToken && userId && storedUserInfo) {
+
+        // Vérifier côté API que l'utilisateur est toujours actif
+        // const response = await axios.get(`/users/${userId}`, {
+        //   headers: {
+        //     Authorization: `Bearer ${storedToken}`,
+        //   },
+        // });
+
         const userData = {
           userId,
           authToken: storedToken,

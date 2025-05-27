@@ -282,7 +282,7 @@ const Home = () => {
           </View>
 
           {/* Objectif financiers */}
-          <View
+          {/* <View
             style={{
               marginTop: 20,
               paddingHorizontal: 15,
@@ -313,7 +313,7 @@ const Home = () => {
                 />
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
           <View
             style={{
               paddingHorizontal: 15,
