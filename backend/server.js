@@ -37,7 +37,6 @@ app.use('/api/auth/goals', goalRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'controllers/uploads')));
 
-
 // Route pour la page d'accueil ("/")
 app.get('/', (req, res) => {
     res.send('Le backend est prêt');
@@ -60,7 +59,7 @@ mongoose.connection.once('open', () => {
     console.log('App connected to MongoDB')
     //Start the server
     app.listen(PORT, () => {
-        console.log(`Le serveur s'exécute sur ${APP_URL}/${PORT}`);
+        console.log(`Le serveur s'exécute sur ${APP_URL}:${PORT}`);
     });
 });
 
